@@ -12,7 +12,7 @@ public class Program
 
 		List<Day> days = new();
 
-		foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == $"AdventOfCode._{year}"))
+		foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == $"AdventOfCode._{year}" && t.IsSubclassOf(typeof(Day))))
 		{
 			Day day = (Day)Activator.CreateInstance(type);
 			days.Add(day);
