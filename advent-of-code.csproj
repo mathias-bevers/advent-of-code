@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="bin\Debug\net6.0\Input\**\*.txt" />
+    <None Include="Input\**\*.txt" />
   </ItemGroup>
 
   <ItemGroup>
