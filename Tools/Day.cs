@@ -6,7 +6,26 @@ namespace AdventOfCode.Tools
 	public abstract class Day : IComparable<Day>
 	{
 		public abstract int DayNumber { get; }
-		public string Year { get; private set; } = string.Empty;
+
+		public string Year
+		{
+			get
+			{
+				Type day = GetType();
+
+				string ns = day.Namespace;
+				if (string.IsNullOrEmpty(ns)) { throw new NoNullAllowedException("All days should be in a namespace"); }
+
+				string[] splitNamespace = ns.Split('_');
+
+				if (splitNamespace.Length != 2)
+				{
+					throw new FormatException("All day classes should be in a namespace with the format \'AdventOfCode._{year}\'");
+				}
+				
+				return splitNamespace.Last();
+			}
+		}
 
 		protected Stopwatch stopwatch = new();
 
@@ -21,24 +40,7 @@ namespace AdventOfCode.Tools
 		}
 
 		//TODO: return double for timer. 
-		public virtual double Initialize()
-		{
-			Type day = GetType();
-
-			string ns = day.Namespace;
-			if (string.IsNullOrEmpty(ns)) { throw new NoNullAllowedException("All days should be in a namespace"); }
-
-			string[] splitNamespace = ns.Split('_');
-
-			if (splitNamespace.Length != 2)
-			{
-				throw new FormatException("All day classes should be in a namespace with the format \'AdventOfCode._{year}\'");
-			}
-
-			Year = splitNamespace[1];
-
-			return 0;
-		}
+		public virtual double Initialize() => 0;
 
 		public abstract string StarOne();
 		public abstract string StarTwo();
@@ -53,7 +55,9 @@ namespace AdventOfCode.Tools
 			int thisYear = int.Parse(Year);
 			int otherYear = int.Parse(other.Year);
 
-			if()
+			int compareYear = thisYear.CompareTo(otherYear);
+
+			return compareYear != 0 ? compareYear : DayNumber.CompareTo(other.DayNumber);
 		}
 	}
 }
