@@ -50,8 +50,10 @@ namespace AdventOfCode.Tools
 				throw new NoNullAllowedException();
 			}
 
-			int yearCompare = string.Compare(Year, other.Year, StringComparison.Ordinal);
-			return yearCompare != 0 ? yearCompare : DayNumber.CompareTo(other.DayNumber);
+			int thisYear = int.Parse(Year);
+			int otherYear = int.Parse(other.Year);
+
+			if()
 		}
 	}
 }
