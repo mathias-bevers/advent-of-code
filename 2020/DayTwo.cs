@@ -2,101 +2,99 @@ using AdventOfCode.Tools;
 
 namespace AdventOfCode._2020
 {
-    public class DayTwo : Day
-    {
-        public override int DayNumber => 2;
+	public class DayTwo : Day
+	{
+		public override int DayNumber => 2;
 
-        private struct PasswordData
-        {
-            public int MinOccurance { get; private set; }
-            public int MaxOccurance { get; private set; }
-            public char CharToCheck { get; private set; }
-            public string Password { get; private set; }
+		private PasswordData[] passwordDatas;
 
-            public PasswordData(int minOccurance, int maxOccurance, char charToCheck, string password)
-            {
-                MinOccurance = minOccurance;
-                MaxOccurance = maxOccurance;
-                CharToCheck = charToCheck;
-                Password = password;
-            }
-        }
+		public override double Initialize()
+		{
+			stopwatch.Start();
+			base.Initialize();
 
-        private PasswordData[] passwordDatas;
+			string[] file = DataRetriever.AsLines(this);
+			passwordDatas = new PasswordData[file.Length];
 
-        public override void Initialize()
-        {
-            base.Initialize();
+			for (int i = 0; i < file.Length; i++)
+			{
+				string[] splitLine = file[i].Split(' ');
 
-            string[] file = DataRetriever.AsLines(this);
-            passwordDatas = new PasswordData[file.Length];
+				string[] numbers = splitLine[0].Split('-');
+				int minOccurance = int.Parse(numbers[0]);
+				int maxOccurance = int.Parse(numbers[1]);
 
-            for (int i = 0; i < file.Length; i++)
-            {
+				string[] chars = splitLine[1].Split(':');
+				char charToCheck = chars[0].ToCharArray()[0];
 
-                string[] splitLine = file[i].Split(' ');
+				string password = splitLine[2];
 
-                string[] numbers = splitLine[0].Split('-');
-                int minOccurance = int.Parse(numbers[0]);
-                int maxOccurance = int.Parse(numbers[1]);
+				passwordDatas[i] = new PasswordData(minOccurance, maxOccurance, charToCheck, password);
+			}
 
-                string[] chars = splitLine[1].Split(':');
-                char charToCheck = chars[0].ToCharArray()[0];
-
-                string password = splitLine[2];
-
-                passwordDatas[i] = new PasswordData(minOccurance, maxOccurance, charToCheck, password);
-            }
-        }
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
+		}
 
 
-        public override string StarOne()
-        {
-            int rightPasswords = 0;
+		public override string StarOne()
+		{
+			int rightPasswords = 0;
 
-            for (int i = 0; i < passwordDatas.Length; i++)
-            {
-                int occurance = 0;
+			for (int i = 0; i < passwordDatas.Length; i++)
+			{
+				int occurance = 0;
 
-                foreach (char character in passwordDatas[i].Password)
-                {
-                    if (character != passwordDatas[i].CharToCheck) continue;
+				foreach (char character in passwordDatas[i].Password)
+				{
+					if (character != passwordDatas[i].CharToCheck) { continue; }
 
-                    occurance++;
-                }
+					occurance++;
+				}
 
-                if (occurance < passwordDatas[i].MinOccurance || occurance > passwordDatas[i].MaxOccurance) continue;
+				if (occurance < passwordDatas[i].MinOccurance || occurance > passwordDatas[i].MaxOccurance) { continue; }
 
-                rightPasswords++;
-            }
+				rightPasswords++;
+			}
 
-            return rightPasswords.ToString();
-        }
+			return rightPasswords.ToString();
+		}
 
-        public override string StarTwo()
-        {
-            int rightPasswords = 0;
+		public override string StarTwo()
+		{
+			int rightPasswords = 0;
 
-            for (int i = 0; i < passwordDatas.Length; i++)
-            {
-                int occurance = 0;
-                char[] passwordAsArray = passwordDatas[i].Password.ToCharArray();
+			for (int i = 0; i < passwordDatas.Length; i++)
+			{
+				int occurance = 0;
+				char[] passwordAsArray = passwordDatas[i].Password.ToCharArray();
 
-                if (passwordDatas[i].CharToCheck == passwordAsArray[passwordDatas[i].MinOccurance - 1])
-                {
-                    occurance++;
-                }
-                if (passwordDatas[i].CharToCheck == passwordAsArray[passwordDatas[i].MaxOccurance - 1])
-                {
-                    occurance++;
-                }
+				if (passwordDatas[i].CharToCheck == passwordAsArray[passwordDatas[i].MinOccurance - 1]) { occurance++; }
 
-                if (occurance != 1) continue;
+				if (passwordDatas[i].CharToCheck == passwordAsArray[passwordDatas[i].MaxOccurance - 1]) { occurance++; }
 
-                rightPasswords++;
-            }
+				if (occurance != 1) { continue; }
 
-            return rightPasswords.ToString();
-        }
-    }
+				rightPasswords++;
+			}
+
+			return rightPasswords.ToString();
+		}
+
+		private struct PasswordData
+		{
+			public char CharToCheck { get; private set; }
+			public int MaxOccurance { get; private set; }
+			public int MinOccurance { get; private set; }
+			public string Password { get; private set; }
+
+			public PasswordData(int minOccurance, int maxOccurance, char charToCheck, string password)
+			{
+				MinOccurance = minOccurance;
+				MaxOccurance = maxOccurance;
+				CharToCheck = charToCheck;
+				Password = password;
+			}
+		}
+	}
 }

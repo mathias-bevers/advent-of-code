@@ -1,54 +1,53 @@
-using System.IO;
-using System;
 using AdventOfCode.Tools;
 
 namespace AdventOfCode._2020
 {
-    public class DayThree : Day
-    {
-        public override int DayNumber => 3;
+	public class DayThree : Day
+	{
+		public override int DayNumber => 3;
 
-        char[,] data;
+		private char[,] data;
 
-        public override void Initialize()
-        {
-            base.Initialize();
+		public override double Initialize()
+		{
+			stopwatch.Start();
+			base.Initialize();
 
-            string[] file = DataRetriever.AsLines(this);
-            data = new char[file[0].Length, file.Length];
+			string[] file = DataRetriever.AsLines(this);
+			data = new char[file[0].Length, file.Length];
 
-            for (int i = 0; i < file.Length; i++)
-            {
-                for (int j = 0; j < file[i].Length; j++)
-                {
-                    data[j, i] = file[i][j];
-                }
-            }
-        }
+			for (int i = 0; i < file.Length; i++)
+			{
+				for (int j = 0; j < file[i].Length; j++) { data[j, i] = file[i][j]; }
+			}
 
-        public override string StarOne() => CheckPath(3, 1).ToString();
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
+		}
 
-        public override string StarTwo()
-        {
-            int totalTreeEncounters = CheckPath(1, 1) * CheckPath(3, 1) * CheckPath(5, 1) * CheckPath(7, 1) * CheckPath(1, 2);
-            return totalTreeEncounters.ToString();
-        }
+		public override string StarOne() => CheckPath(3, 1).ToString();
 
-        private int CheckPath(int right, int down)
-        {
-            int treeEncounters = 0;
+		public override string StarTwo()
+		{
+			int totalTreeEncounters = CheckPath(1, 1) * CheckPath(3, 1) * CheckPath(5, 1) * CheckPath(7, 1) * CheckPath(1, 2);
+			return totalTreeEncounters.ToString();
+		}
 
-            for (int y = 0, x = 0; y < data.GetLength(1); y += down, x += right)
-            {
-                if (x >= data.GetLength(0))
-                {
-                    x -= data.GetLength(0);
-                }
+		private int CheckPath(int right, int down)
+		{
+			int treeEncounters = 0;
 
-                if (data[x, y] == '#') treeEncounters++;
-            }
+			for (int y = 0,
+			     x = 0;
+			     y < data.GetLength(1);
+			     y += down, x += right)
+			{
+				if (x >= data.GetLength(0)) { x -= data.GetLength(0); }
 
-            return treeEncounters;
-        }
-    }
+				if (data[x, y] == '#') { treeEncounters++; }
+			}
+
+			return treeEncounters;
+		}
+	}
 }

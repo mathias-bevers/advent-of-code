@@ -1,128 +1,128 @@
-using System.Collections.Generic;
 using AdventOfCode.Tools;
 
-namespace AdventOfCode
+namespace AdventOfCode._2020
 {
-    public class DayEight : Day
-    {
-        public override int DayNumber => 8;
+	public class DayEight : Day
+	{
+		public override int DayNumber => 8;
 
-        private string[] data;
+		private string[] data;
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            data = DataRetriever.AsLines(this);
-        }
+		public override double Initialize()
+		{
+			stopwatch.Start();
+			base.Initialize();
+			data = DataRetriever.AsLines(this);
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
+		}
 
-        public override string StarOne()
-        {
-            int accumulator = 0;
-            List<int> vistitedOperationsIndex = new List<int>();
+		public override string StarOne()
+		{
+			int accumulator = 0;
+			List<int> vistitedOperationsIndex = new();
 
-            for (int i = 0; i < data.Length;)
-            {
-                if (vistitedOperationsIndex.Contains(i))
-                {
-                    return accumulator.ToString();
-                }
+			for (int i = 0; i < data.Length;)
+			{
+				if (vistitedOperationsIndex.Contains(i)) { return accumulator.ToString(); }
 
-                string[] operation = data[i].Split(' ');
-                vistitedOperationsIndex.Add(i);
+				string[] operation = data[i].Split(' ');
+				vistitedOperationsIndex.Add(i);
 
-                switch (operation[0].Trim())
-                {
-                    case "nop":
-                        i++;
-                        break;
-                    case "acc":
-                        accumulator += int.Parse(operation[1].Trim());
-                        i++;
-                        break;
-                    case "jmp":
-                        i += int.Parse(operation[1].Trim());
-                        break;
-                    default:
-                        Debug.LogError($"{operation[0].Trim()} is not a supported value");
-                        break;
-                }
-            }
+				switch (operation[0].Trim())
+				{
+					case "nop":
+						i++;
+						break;
+					case "acc":
+						accumulator += int.Parse(operation[1].Trim());
+						i++;
+						break;
+					case "jmp":
+						i += int.Parse(operation[1].Trim());
+						break;
+					default:
+						Debug.LogError($"{operation[0].Trim()} is not a supported value");
+						break;
+				}
+			}
 
-            return "NO AWNSER FOUND";
-        }
+			return "NO AWNSER FOUND";
+		}
 
-        public override string StarTwo()
-        {
-            int accumulator = 0;
+		public override string StarTwo()
+		{
+			int accumulator = 0;
 
-            for (int i = 0; i < data.Length; i++)
-            {
-                string[] dataCopy = (string[])data.Clone();
-                string substring = data[i].Substring(0, 3);
+			for (int i = 0; i < data.Length; i++)
+			{
+				string[] dataCopy = (string[])data.Clone();
+				string substring = data[i].Substring(0, 3);
 
-                if (substring == "acc") continue;
+				if (substring == "acc") { continue; }
 
-                dataCopy[i] = substring == "jmp" ? dataCopy[i].Replace("jmp", "nop") : dataCopy[i].Replace("nop", "jmp");
+				dataCopy[i] = substring == "jmp" ? dataCopy[i].Replace("jmp", "nop") : dataCopy[i].Replace("nop", "jmp");
 
-                if (rightReplacement(dataCopy))
-                {
-                    for (int j = 0; j < dataCopy.Length;)
-                    {
-                        string[] operation = dataCopy[j].Split(' ');
+				if (rightReplacement(dataCopy))
+				{
+					for (int j = 0; j < dataCopy.Length;)
+					{
+						string[] operation = dataCopy[j].Split(' ');
 
-                        switch (operation[0].Trim())
-                        {
-                            case "nop":
-                                j++;
-                                break;
-                            case "acc":
-                                accumulator += int.Parse(operation[1].Trim());
-                                j++;
-                                break;
-                            case "jmp":
-                                j += int.Parse(operation[1].Trim());
-                                break;
-                            default:
-                                Debug.LogError($"{operation[0].Trim()} is not a supported value");
-                                break;
-                        }
-                    }
-                    return accumulator.ToString();
-                }
-            }
+						switch (operation[0].Trim())
+						{
+							case "nop":
+								j++;
+								break;
+							case "acc":
+								accumulator += int.Parse(operation[1].Trim());
+								j++;
+								break;
+							case "jmp":
+								j += int.Parse(operation[1].Trim());
+								break;
+							default:
+								Debug.LogError($"{operation[0].Trim()} is not a supported value");
+								break;
+						}
+					}
 
-            bool rightReplacement(string[] testProgram)
-            {
-                List<int> checkedOperations = new List<int>();
+					return accumulator.ToString();
+				}
+			}
 
-                for (int i = 0; i < testProgram.Length;)
-                {
-                    if (checkedOperations.Contains(i)) return false;
+			bool rightReplacement(string[] testProgram)
+			{
+				List<int> checkedOperations = new();
 
-                    string[] operation = testProgram[i].Split(' ');
-                    checkedOperations.Add(i);
+				for (int i = 0; i < testProgram.Length;)
+				{
+					if (checkedOperations.Contains(i)) { return false; }
 
-                    switch (operation[0].Trim())
-                    {
-                        case "nop":
-                            i++;
-                            break;
-                        case "acc":
-                            i++;
-                            break;
-                        case "jmp":
-                            i += int.Parse(operation[1].Trim());
-                            break;
-                        default:
-                            Debug.LogError($"{operation[0].Trim()} is not a supported value");
-                            break;
-                    }
-                }
+					string[] operation = testProgram[i].Split(' ');
+					checkedOperations.Add(i);
 
-                return true;
-            }
+					switch (operation[0].Trim())
+					{
+						case "nop":
+							i++;
+							break;
+						case "acc":
+							i++;
+							break;
+						case "jmp":
+							i += int.Parse(operation[1].Trim());
+							break;
+						default:
+							Debug.LogError($"{operation[0].Trim()} is not a supported value");
+							break;
+					}
+				}
 
-            return "NO AWNSER FOUND";
-        }
-    }
+				return true;
+			}
+
+			return "NO AWNSER FOUND";
+		}
+	}
 }

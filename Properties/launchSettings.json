@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "advent-of-code": {
+      "commandName": "Project"
+    },
+    "all": {
+      "commandName": "Project",
+      "commandLineArgs": "all"
+    }
+  }
+}

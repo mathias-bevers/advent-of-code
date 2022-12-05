@@ -15,10 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="bin\Debug\net6.0\Input\**\*.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="2020\" />
     <Folder Include="2021\" />
     <Folder Include="2022\" />
-    <Folder Include="Tools\" />
   </ItemGroup>
-
 </Project>
