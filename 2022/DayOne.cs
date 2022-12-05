@@ -5,14 +5,16 @@ namespace AdventOfCode._2022
 	public class DayOne : Day
 	{
 		public override int DayNumber => 1;
-		private string[] data;
 		private List<int> chunkSums;
+		private string[] data;
 
-		public override void Initialize()
+		public override double Initialize()
 		{
+			stopwatch.Start();
 			base.Initialize();
-
 			data = DataRetriever.AsFile(this).Split(new[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
 		}
 
 		public override string StarOne()
@@ -41,10 +43,7 @@ namespace AdventOfCode._2022
 		{
 			int sumOfThree = 0;
 
-			for (int i = 1; i <= 3; ++i)
-			{
-				sumOfThree += chunkSums[^i];
-			}
+			for (int i = 1; i <= 3; ++i) { sumOfThree += chunkSums[^i]; }
 
 			return sumOfThree.ToString();
 		}

@@ -7,8 +7,9 @@ namespace AdventOfCode._2022
 		public override int DayNumber => 4;
 		private List<(ElfAssignment, ElfAssignment)> elfPairs = new();
 
-		public override void Initialize()
+		public override double Initialize()
 		{
+			stopwatch.Start();
 			base.Initialize();
 
 			foreach (string line in DataRetriever.AsLines(this))
@@ -23,6 +24,9 @@ namespace AdventOfCode._2022
 
 				elfPairs.Add((a, b));
 			}
+
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
 		}
 
 		public override string StarOne()
@@ -31,8 +35,10 @@ namespace AdventOfCode._2022
 
 			foreach ((ElfAssignment, ElfAssignment) elfPair in elfPairs)
 			{
-				if (elfPair.Item1.IsFullyContainedBy(elfPair.Item2) ||
-				    elfPair.Item2.IsFullyContainedBy(elfPair.Item1)) { ++fullyContainedPairs; }
+				if (elfPair.Item1.IsFullyContainedBy(elfPair.Item2) || elfPair.Item2.IsFullyContainedBy(elfPair.Item1))
+				{
+					++fullyContainedPairs;
+				}
 			}
 
 			return fullyContainedPairs.ToString();
@@ -44,10 +50,7 @@ namespace AdventOfCode._2022
 
 			foreach ((ElfAssignment, ElfAssignment) elfPair in elfPairs)
 			{
-				if (elfPair.Item1.IsOverLappingWith(elfPair.Item2))
-				{
-					++overlappingPairs;
-				}
+				if (elfPair.Item1.IsOverLappingWith(elfPair.Item2)) { ++overlappingPairs; }
 			}
 
 			return overlappingPairs.ToString();

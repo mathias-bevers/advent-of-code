@@ -9,11 +9,13 @@ namespace AdventOfCode._2022
 		public override int DayNumber => 5;
 		public Stack<char>[] crates;
 
-		public override void Initialize()
+		public override double Initialize()
 		{
-			base.Initialize();
-			string[] fullFile = DataRetriever.AsFile(this).Split(new[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+			stopwatch.Start();
 
+			base.Initialize();
+
+			string[] fullFile = DataRetriever.AsFile(this).Split(new[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (string line in fullFile[1].Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))
 			{
 				string[] commandParts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -51,6 +53,9 @@ namespace AdventOfCode._2022
 
 				crates[x] = reversed;
 			}
+
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
 		}
 
 		public override string StarOne()

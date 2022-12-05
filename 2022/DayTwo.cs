@@ -14,10 +14,10 @@ namespace AdventOfCode._2022
 
 		public override int DayNumber { get; } = 2;
 		private List<(char, char)> data = new();
-
-
-		public override void Initialize()
+		
+		public override double Initialize()
 		{
+			stopwatch.Start();
 			base.Initialize();
 			foreach (string line in DataRetriever.AsLines(this))
 			{
@@ -31,6 +31,9 @@ namespace AdventOfCode._2022
 				char response = parts[1][0];
 				data.Add((opponent, response));
 			}
+
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
 		}
 
 		public override string StarOne()
@@ -94,6 +97,7 @@ namespace AdventOfCode._2022
 						else if (line.Item1 == PAPER.Opponent) { totalScore += WIN_POINTS + SCISSORS.Value; }
 						else if (line.Item1 == SCISSORS.Opponent) { totalScore += WIN_POINTS + ROCK.Value; }
 						else { Debug.LogError($"Unrecognized response \'{line.Item1}\'"); }
+
 						break;
 					default:
 						Debug.LogError($"Unrecognized response \'{line.Item2}\'");

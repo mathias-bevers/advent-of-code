@@ -1,132 +1,136 @@
-using System.Collections.Generic;
 using AdventOfCode.Tools;
-using System;
 
 namespace AdventOfCode._2020
 {
-    public class DayFive : Day
-    {
-        public override int DayNumber => 5;
+	public class DayFive : Day
+	{
+		public override int DayNumber => 5;
+		private List<BoardingPass> boardingPasses = new();
 
-        private string[] data;
-        private List<BoardingPass> boardingPasses = new List<BoardingPass>();
+		private string[] data;
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            data = DataRetriever.AsLines(this);
-        }
+		public override double Initialize()
+		{
+			stopwatch.Start();
+			base.Initialize();
+			data = DataRetriever.AsLines(this);
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
+		}
 
-        private struct BoardingPass
-        {
-            public int Row { get; private set; }
-            public int Column { get; private set; }
-            public int Id { get; private set; }
+		public override string StarOne()
+		{
+			int FindRow(string row)
+			{
+				int min = 0;
+				int max = 127;
 
-            public BoardingPass(int row, int column)
-            {
-                Row = row;
-                Column = column;
+				foreach (char character in row)
+				{
+					int difference = max - min;
 
-                Id = row * 8 + column;
-            }
-        }
+					if (character == 'F')
+					{
+						max = min + (int)Math.Floor(difference * 0.5f);
+						continue;
+					}
 
-        public override string StarOne()
-        {
-            int FindRow(string row)
-            {
-                int min = 0;
-                int max = 127;
+					if (character == 'B')
+					{
+						min += (int)Math.Ceiling(difference * 0.5f);
+						continue;
+					}
 
-                foreach (char character in row)
-                {
-                    int difference = max - min;
+					Debug.LogError($"{character} is not a valid in put!");
+				}
 
-                    if (character == 'F')
-                    {
-                        max = min + ((int)(Math.Floor(difference * 0.5f)));
-                        continue;
-                    }
+				if (min != max) { Debug.LogError($"{min} != {max}"); }
 
-                    if (character == 'B')
-                    {
-                        min += ((int)(Math.Ceiling(difference * 0.5f)));
-                        continue;
-                    }
+				return max;
+			}
 
-                    Debug.LogError($"{character} is not a valid in put!");
-                }
+			int FindColumn(string column)
+			{
+				int min = 0;
+				int max = 7;
 
-                if (min != max) Debug.LogError($"{min} != {max}");
+				foreach (char character in column)
+				{
+					int difference = max - min;
 
-                return max;
-            }
+					if (character == 'L')
+					{
+						//Floor
+						max = min + (int)Math.Floor(difference * 0.5f);
+						continue;
+					}
 
-            int FindColumn(string column)
-            {
-                int min = 0;
-                int max = 7;
+					if (character == 'R')
+					{
+						//Ceiling
+						min += (int)Math.Ceiling(difference * 0.5f);
+						continue;
+					}
 
-                foreach (char character in column)
-                {
-                    int difference = max - min;
+					Debug.LogError($"{character} is not a valid in put!");
+				}
 
-                    if (character == 'L')
-                    {
-                        //Floor
-                        max = min + ((int)(Math.Floor(difference * 0.5f)));
-                        continue;
-                    }
+				if (min != max) { Debug.LogError($"{min} != {max}"); }
 
-                    if (character == 'R')
-                    {
-                        //Ceiling
-                        min += ((int)(Math.Ceiling(difference * 0.5f)));
-                        continue;
-                    }
+				return max;
+			}
 
-                    Debug.LogError($"{character} is not a valid in put!");
-                }
+			foreach (string line in data)
+			{
+				int row = FindRow(line.Substring(0, 7));
+				int column = FindColumn(line.Substring(7, 3));
 
-                if (min != max) Debug.LogError($"{min} != {max}");
+				boardingPasses.Add(new BoardingPass(row, column));
+			}
 
-                return max;
-            }
+			int highestId = 0;
 
-            foreach (string line in data)
-            {
-                int row = FindRow(line.Substring(0, 7));
-                int column = FindColumn(line.Substring(7, 3));
+			foreach (BoardingPass boardingPass in boardingPasses)
+			{
+				if (boardingPass.Id <= highestId) { continue; }
 
-                boardingPasses.Add(new BoardingPass(row, column));
-            }
+				highestId = boardingPass.Id;
+			}
 
-            int highestId = 0;
+			return highestId.ToString();
+		}
 
-            foreach (BoardingPass boardingPass in boardingPasses)
-            {
-                if (boardingPass.Id <= highestId) continue;
+		public override string StarTwo()
+		{
+			List<int> boardingPassIds = boardingPasses.ConvertAll(boardingPass => boardingPass.Id);
+			int seatId = 0;
 
-                highestId = boardingPass.Id;
-            }
+			for (int i = 0; i < boardingPassIds.Count; i++)
+			{
+				if (boardingPassIds.Contains(boardingPasses[i].Id + 1) || !boardingPassIds.Contains(boardingPasses[i].Id))
+				{
+					continue;
+				}
 
-            return highestId.ToString();
-        }
+				seatId = boardingPasses[i].Id + 1;
+			}
 
-        public override string StarTwo()
-        {
-            List<int> boardingPassIds = boardingPasses.ConvertAll(boardingPass => boardingPass.Id);
-            int seatId = 0;
+			return seatId.ToString();
+		}
 
-            for (int i = 0; i < boardingPassIds.Count; i++)
-            {
-                if (boardingPassIds.Contains(boardingPasses[i].Id + 1) || !boardingPassIds.Contains(boardingPasses[i].Id)) continue;
+		private struct BoardingPass
+		{
+			public int Column { get; private set; }
+			public int Id { get; private set; }
+			public int Row { get; private set; }
 
-                seatId = boardingPasses[i].Id + 1;
-            }
+			public BoardingPass(int row, int column)
+			{
+				Row = row;
+				Column = column;
 
-            return seatId.ToString();
-        }
-    }
+				Id = (row * 8) + column;
+			}
+		}
+	}
 }

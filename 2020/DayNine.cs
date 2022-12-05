@@ -1,117 +1,114 @@
-using System.Collections.Generic;
 using AdventOfCode.Tools;
-using System.Linq;
-using System.IO;
 
 namespace AdventOfCode._2020
 {
-    public class DayNine : Day
-    {
-        public override int DayNumber => 9;
+	public class DayNine : Day
+	{
+		public override int DayNumber => 9;
+		private int preamble = 25;
+		private long invalidValue = 0;
+		private long invalidIndex = 0;
 
-        private long[] data;
-        private int preamble = 25;
-        private long invalidValue = 0;
-        private long invalidIndex = 0;
+		private long[] data;
 
-        public override void Initialize()
-        {
-            base.Initialize();
+		public override double Initialize()
+		{
+			stopwatch.Start();
+			base.Initialize();
 
-            string[] file = File.ReadAllLines($@"{Directory.GetCurrentDirectory()}\Data\{GetType().Name}.txt");
-            data = new long[file.Length];
+			string[] file = DataRetriever.AsLines(this);
+			data = new long[file.Length];
 
-            for (int i = 0; i < file.Length; i++)
-            {
-                data[i] = long.Parse(file[i]);
-            }
-        }
+			for (int i = 0; i < file.Length; i++) { data[i] = long.Parse(file[i]); }
 
-        public override string StarOne()
-        {
-            for (int i = preamble; i < data.Length; i++)
-            {
-                if (!isValid(i))
-                {
-                    invalidIndex = i;
-                    invalidValue = data[i];
-                    return invalidValue.ToString();
-                }
-            }
+			stopwatch.Stop();
+			return stopwatch.ElapsedMilliseconds;
+		}
 
-            bool isValid(int toCheck)
-            {
-                List<long> combinations = new List<long>();
+		public override string StarOne()
+		{
+			for (int i = preamble; i < data.Length; i++)
+			{
+				if (!isValid(i))
+				{
+					invalidIndex = i;
+					invalidValue = data[i];
+					return invalidValue.ToString();
+				}
+			}
 
-                for (int i = toCheck - preamble; i < toCheck; i++)
-                {
-                    for (int j = toCheck - preamble; j < toCheck; j++)
-                    {
-                        if (i == j) continue;
-                        combinations.Add(data[i] + data[j]);
-                    }
-                }
+			bool isValid(int toCheck)
+			{
+				List<long> combinations = new();
 
-                foreach (long combination in combinations)
-                {
-                    if (combination == data[toCheck]) return true;
-                }
+				for (int i = toCheck - preamble; i < toCheck; i++)
+				{
+					for (int j = toCheck - preamble; j < toCheck; j++)
+					{
+						if (i == j) { continue; }
 
-                return false;
-            }
+						combinations.Add(data[i] + data[j]);
+					}
+				}
 
-            return "NO AWNSER FOUND";
-        }
+				foreach (long combination in combinations)
+				{
+					if (combination == data[toCheck]) { return true; }
+				}
 
-        public override string StarTwo()
-        {
-            int firstIndex = 0;
-            int lastIndex = 1;
+				return false;
+			}
 
-            while (firstIndex < invalidIndex)
-            {
-                List<long> checking = data.ToList().GetRange(firstIndex, (lastIndex - firstIndex) + 1);
-                long sum = checking.Sum();
+			return "NO AWNSER FOUND";
+		}
 
-                if (sum == invalidValue)
-                {
-                    checking.Sort();
-                    return (checking.First() + checking.Last()).ToString();
-                }
+		public override string StarTwo()
+		{
+			int firstIndex = 0;
+			int lastIndex = 1;
 
-                if (lastIndex < invalidIndex - 1)
-                {
-                    lastIndex++;
-                }
-                else
-                {
-                    firstIndex++;
-                    lastIndex = firstIndex + 1;
-                }
-            }
+			while (firstIndex < invalidIndex)
+			{
+				List<long> checking = data.ToList().GetRange(firstIndex, (lastIndex - firstIndex) + 1);
+				long sum = checking.Sum();
 
-            return "NO AWNSER FOUND";
-        }
+				if (sum == invalidValue)
+				{
+					checking.Sort();
+					return (checking.First() + checking.Last()).ToString();
+				}
 
-        private bool isValid(int toCheck)
-        {
-            List<long> combinations = new List<long>();
+				if (lastIndex < invalidIndex - 1) { lastIndex++; }
+				else
+				{
+					firstIndex++;
+					lastIndex = firstIndex + 1;
+				}
+			}
 
-            for (int i = toCheck - preamble; i < toCheck; i++)
-            {
-                for (int j = i; j < toCheck; j++)
-                {
-                    if (i == j) continue;
-                    combinations.Add(data[i] + data[j]);
-                }
-            }
+			return "NO AWNSER FOUND";
+		}
 
-            foreach (long combination in combinations)
-            {
-                if (combination == data[toCheck]) return true;
-            }
+		private bool isValid(int toCheck)
+		{
+			List<long> combinations = new();
 
-            return false;
-        }
-    }
+			for (int i = toCheck - preamble; i < toCheck; i++)
+			{
+				for (int j = i; j < toCheck; j++)
+				{
+					if (i == j) { continue; }
+
+					combinations.Add(data[i] + data[j]);
+				}
+			}
+
+			foreach (long combination in combinations)
+			{
+				if (combination == data[toCheck]) { return true; }
+			}
+
+			return false;
+		}
+	}
 }
