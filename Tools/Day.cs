@@ -17,6 +17,7 @@ namespace AdventOfCode.Tools
 			Console.WriteLine($"solved in {time}ms");
 		}
 
+		//TODO: return double for timer. 
 		public virtual void Initialize()
 		{
 			Type day = GetType();
