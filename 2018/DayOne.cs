@@ -38,7 +38,6 @@ namespace AdventOfCode._2018
 		public override string StarTwo()
 		{
 			int frequency = endFrequency;
-			Debug.Log(frequency);
 
 			while (true)
 			{
