@@ -19,7 +19,7 @@ namespace AdventOfCode._2021
 
 			string[] splitFile = DataRetriever.AsFile(this).Split(new[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-			for (int i = 1; i < splitFile.Length; i++) //Whole cards
+			for (int i = 1; i < splitFile.Length; i++)
 			{
 				int[,] bingoCard = new int[5, 5];
 				string[] rows = splitFile[i].Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -65,10 +65,9 @@ namespace AdventOfCode._2021
 					bingoCard.TryCrossOff(drawnNumber);
 					if (bingoCard.IsCompleted()) { completedBingoCards.Add(bingoCard); }
 
-					if (completedBingoCards.Count < bingoCards.Count - 1) { continue; }
+					if (completedBingoCards.Count < bingoCards.Count) { continue; }
 
-					List<BingoCard> uniqueCards = bingoCards.Except(completedBingoCards).ToList();
-					BingoCard lastToWin = uniqueCards[0];
+					BingoCard lastToWin = completedBingoCards.Last();
 					return lastToWin.CalculateScore(drawnNumber).ToString();
 				}
 			}
