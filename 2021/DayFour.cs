@@ -75,7 +75,7 @@ namespace AdventOfCode._2021
 			return "FAILED";
 		}
 
-		private struct BingoCard
+		private readonly struct BingoCard
 		{
 			private readonly KeyValuePair<int, bool>[,] card = new KeyValuePair<int, bool>[5, 5];
 
