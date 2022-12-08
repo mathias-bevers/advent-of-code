@@ -45,7 +45,8 @@ public class Program
             foreach (Day day in days)
             {
                 double elapsedTime = day.Initialize();
-                Console.WriteLine($"\nInitialized day: {day.Year}-{day.DayNumber} in {elapsedTime}ms");
+                string message = $"\nInitialized day: {day.Year}-{day.DayNumber,-39}in {elapsedTime}ms";
+                Console.WriteLine(message);
 
                 try
                 {
@@ -69,7 +70,7 @@ public class Program
 			Debug.LogWaring($"There are no days made in the year: {year}");
 		}
 
-        Console.Write("Press enter to close...");
+        Console.Write("\n\nPress enter to close...");
         Console.ReadLine();
     }
 }

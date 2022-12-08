@@ -6,6 +6,7 @@ namespace AdventOfCode.Tools
 	public abstract class Day : IComparable<Day>
 	{
 		public abstract int DayNumber { get; }
+		private const int MAX_ANSWER_PADDING = 30;
 
 		public string Year
 		{
@@ -34,9 +35,11 @@ namespace AdventOfCode.Tools
 			Console.ForegroundColor = ConsoleColor.Green;
 			Console.Write("[ANSWER] ");
 			Console.ResetColor();
-			Console.Write($"(day:{dayNumber} *{starNumber})\t{answer}\t");
-			Console.ForegroundColor = ConsoleColor.Gray;
+			string trimmedAnswer = string.Concat(answer.Where(c => !char.IsWhiteSpace(c)));
+			Console.Write($"(day:{dayNumber} *{starNumber})\t{trimmedAnswer}" + new string(' ', MAX_ANSWER_PADDING - trimmedAnswer.Length));
+			Console.ForegroundColor = ConsoleColor.DarkGray;
 			Console.WriteLine($"solved in {time}ms");
+			Console.ResetColor();
 		}
 
 		//TODO: return double for timer. 

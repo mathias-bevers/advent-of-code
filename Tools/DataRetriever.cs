@@ -13,8 +13,11 @@
 			string solutionPath = TryFindSolutionPath();
 			string path = solutionPath + $@"\Input\{day.Year}\{day.GetType().Name}.txt";
 
-			if (!File.Exists(path)) { Debug.LogError($"There is no file for day {day.Year}-{day.DayNumber}"); }
+			if (File.Exists(path)) { return path; }
 
+			Debug.LogWaring($"There is no file for day {day.Year}-{day.DayNumber}, one is now created.");
+			var stream = File.Create(path);
+			stream.Close();
 			return path;
 		}
 
