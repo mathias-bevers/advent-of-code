@@ -18,7 +18,7 @@ namespace AdventOfCode._2022
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			foreach (string line in DataRetriever.AsLines(this))
 			{
 				string[] parts = line.Split(' ');

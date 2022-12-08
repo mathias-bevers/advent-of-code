@@ -10,7 +10,7 @@ namespace AdventOfCode._2020
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			data = DataRetriever.AsIntArray(this);
 			stopwatch.Stop();
 			return stopwatch.ElapsedMilliseconds;

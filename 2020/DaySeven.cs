@@ -17,7 +17,7 @@ namespace AdventOfCode._2020
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 
 			data = DataRetriever.AsLines(this);
 

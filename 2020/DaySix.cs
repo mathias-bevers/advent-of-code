@@ -11,7 +11,7 @@ namespace AdventOfCode._2020
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			data = DataRetriever.AsFile(this).Split(new[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 			stopwatch.Stop();
 			return stopwatch.ElapsedMilliseconds;

@@ -11,7 +11,7 @@ namespace AdventOfCode._2022
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			data = DataRetriever.AsLines(this);
 			stopwatch.Stop();
 			return stopwatch.ElapsedMilliseconds;

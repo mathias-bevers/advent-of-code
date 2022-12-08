@@ -12,7 +12,7 @@ namespace AdventOfCode._2021
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 
 			string firstLine = DataRetriever.AsLines(this).First();
 			drawnNumbers = firstLine.Split(",").Select(int.Parse).ToArray();
