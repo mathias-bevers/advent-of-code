@@ -11,38 +11,24 @@ namespace AdventOfCode._2022
 		public override double Initialize()
 		{
 			stopwatch.Start();
-
-			List<CommandAndResult> commands = new();
-
+			
 			string[] dataStrings = DataRetriever.AsLines(this);
+			
+			string currentDirectory = string.Empty;
+			directoryElements.Add(new DirectoryElement("/", string.Empty, false));
+
 			for (int i = 0; i < dataStrings.Length; i++)
 			{
 				if (!dataStrings[i].StartsWith('$')) { continue; }
 
 				string[] command = dataStrings[i].Split(' ');
 				string commandType = command[1];
-				string commandArguments = command.Length < 3 ? string.Empty : command[2];
-				List<string> output = new();
+				string commandArgument = command.Length < 3 ? string.Empty : command[2];
 
-				int j = i + 1;
-				while (!(j >= dataStrings.Length || dataStrings[j].StartsWith('$')))
-				{
-					output.Add(dataStrings[j]);
-					++j;
-				}
-
-				i += output.Count;
-				commands.Add(new CommandAndResult(commandType, commandArguments, output));
-			}
-
-			string currentDirectory = string.Empty;
-			directoryElements.Add(new DirectoryElement("/", string.Empty, null));
-			foreach (CommandAndResult car in commands)
-			{
-				switch (car.CommandType)
+				switch (commandType)
 				{
 					case "cd":
-						switch (car.CommandArguments)
+						switch (commandArgument)
 						{
 							case "/":
 								currentDirectory = string.Empty;
@@ -54,23 +40,28 @@ namespace AdventOfCode._2022
 								break;
 
 							default:
-								currentDirectory += $"/{car.CommandArguments}";
+								currentDirectory += $"/{commandArgument}";
 								break;
 						}
 
 						break;
 
 					case "ls":
-						foreach (string content in car.Output)
+						int j = i + 1;
+						while (!(j >= dataStrings.Length || dataStrings[j].StartsWith('$')))
 						{
-							string[] splitContent = content.Split(' ');
+							string[] splitContent = dataStrings[j].Split(' ');
 							string elementName = '/' + splitContent[1];
-							int? fileSize = int.TryParse(splitContent[0], out int fs) ? fs : null;
 
-							DirectoryElement directoryElement = new(elementName, currentDirectory, fileSize);
+							DirectoryElement directoryElement = int.TryParse(splitContent[0], out int fs)
+								? new DirectoryElement(elementName, currentDirectory, true, fs)
+								: new DirectoryElement(elementName, currentDirectory, false);
+
 							if (directoryElements.Count(d => d.ToString() == directoryElement.ToString()) != 0) { continue; }
 
 							directoryElements.Add(directoryElement);
+
+							++j;
 						}
 
 						break;
@@ -90,109 +81,78 @@ namespace AdventOfCode._2022
 
 		public override string StarOne()
 		{
-			return directoryElements.Where(de => !de.FileSize.HasValue)
-				.Where(directoryElement => directoryElement.DirectorySize <= 100000)
-				.Sum(directoryElement => directoryElement.DirectorySize)
+			return directoryElements.Where(de => !de.IsFile)
+				.Where(directoryElement => directoryElement.Size <= 100000)
+				.Sum(directoryElement => directoryElement.Size)
 				.ToString();
 		}
 
 
 		public override string StarTwo()
 		{
-			const long totalDiskSpace = 70000000;
-			const long diskSpaceNeeded = 30000000;
+			const int totalDiskSpace = 70000000;
+			const int diskSpaceNeeded = 30000000;
 
-			long rootSize = directoryElements.Find(de => de.Name == "/").DirectorySize;
-			long freeDiskSpace = totalDiskSpace - rootSize;
-			long toClearDiskSpace = diskSpaceNeeded - freeDiskSpace;
+			DirectoryElement? root = directoryElements.Find(de => de.Name == "/");
+
+			if (root == null)
+			{
+				Debug.LogError("Could not find directory root");
+				return "FAILED";
+			}
+
+			int rootSize = root.Size;
+			int freeDiskSpace = totalDiskSpace - rootSize;
+			int toClearDiskSpace = diskSpaceNeeded - freeDiskSpace;
 
 			List<DirectoryElement> couldBeDeleted = new();
-			foreach (DirectoryElement directoryElement in directoryElements.Where(de => !de.FileSize.HasValue))
+			foreach (DirectoryElement directoryElement in directoryElements.Where(de => !de.IsFile))
 			{
-				if (directoryElement.DirectorySize < toClearDiskSpace)
-				{
-					continue;
-				}
+				if (directoryElement.Size < toClearDiskSpace) { continue; }
 
 				couldBeDeleted.Add(directoryElement);
 			}
 
-			return couldBeDeleted.OrderBy(element => element.DirectorySize).First().DirectorySize.ToString();
-		}
-
-		private readonly struct CommandAndResult
-		{
-			public List<string> Output { get; }
-			public string CommandArguments { get; }
-			public string CommandType { get; }
-
-			public CommandAndResult(string commandType, string commandArguments, IEnumerable<string> output)
-			{
-				CommandType = commandType;
-				CommandArguments = commandArguments;
-
-				Output = output.ToList();
-			}
-
-			public override string ToString()
-			{
-				string s = $"{CommandType} {CommandArguments} \n";
-
-				for (int i = 0; i < Output.Count; ++i)
-				{
-					if (i >= Output.Count - 1)
-					{
-						s += $"\t{Output[i]}";
-						break;
-					}
-
-					s += $"\t{Output[i]}\n";
-				}
-
-				return s;
-			}
+			return couldBeDeleted.OrderBy(element => element.Size).First().Size.ToString();
 		}
 
 		private class DirectoryElement
 		{
-			public int? FileSize { get; }
+			private int size = -1;
+
+
+			public bool IsFile { get; }
 			public List<DirectoryElement> Contents { get; }
 
-			public long DirectorySize
+			public int Size
 			{
 				get
 				{
-					if (directorySize == -1)
+					if (IsFile)
 					{
-						long sum = 0;
-						foreach (DirectoryElement element in Contents)
-						{
-							if (element.FileSize.HasValue)
-							{
-								sum += element.FileSize.Value;
-								continue;
-							}
-
-							sum += element.DirectorySize;
-						}
-
-						directorySize = sum;
+						return size;
 					}
 
-					return directorySize;
+					if (size != -1)
+					{
+						return size;
+					}
+
+					size = Contents.Sum(directoryElement => directoryElement.Size);
+					return size;
 				}
 			}
-
 			public string Location { get; }
 			public string Name { get; }
 
-			private long directorySize = -1;
-
-			public DirectoryElement(string name, string location, int? fileSize)
+			public DirectoryElement(string name, string location, bool isFile, int size = -1)
 			{
 				Name = name;
 				Location = location;
-				FileSize = fileSize;
+				IsFile = isFile;
+
+				if (isFile) { this.size = size; }
+
 				Contents = new List<DirectoryElement>();
 			}
 
