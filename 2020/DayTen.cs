@@ -10,7 +10,7 @@ namespace AdventOfCode._2020
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			data = DataRetriever.AsIntArray(this).ToList();
 			data.Add(0);
 			data.Sort();

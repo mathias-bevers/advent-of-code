@@ -11,7 +11,7 @@ namespace AdventOfCode._2018
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			string[] lines = DataRetriever.AsLines(this);
 			elfClaims = new ElfClaim[lines.Length];
 

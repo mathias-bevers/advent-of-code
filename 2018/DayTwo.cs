@@ -11,7 +11,7 @@ namespace AdventOfCode._2018
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			boxIDs = DataRetriever.AsLines(this);
 			stopwatch.Stop();
 			return stopwatch.ElapsedMilliseconds;

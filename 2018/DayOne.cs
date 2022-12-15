@@ -13,7 +13,7 @@ namespace AdventOfCode._2018
 		{
 			stopwatch.Start();
 
-			base.Initialize();
+			
 			frequencies = DataRetriever.AsIntArray(this);
 
 			stopwatch.Stop();

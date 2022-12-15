@@ -13,7 +13,7 @@ namespace AdventOfCode._2022
 		{
 			stopwatch.Start();
 
-			base.Initialize();
+			
 
 			string[] fullFile = DataRetriever.AsFile(this).Split(new[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (string line in fullFile[1].Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries))

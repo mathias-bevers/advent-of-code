@@ -8,23 +8,29 @@ namespace AdventOfCode.Tools
 		public abstract int DayNumber { get; }
 		private const int MAX_ANSWER_PADDING = 30;
 
+		private string year = string.Empty;
 		public string Year
 		{
 			get
 			{
-				Type day = GetType();
-
-				string ns = day.Namespace;
-				if (string.IsNullOrEmpty(ns)) { throw new NoNullAllowedException("All days should be in a namespace"); }
-
-				string[] splitNamespace = ns.Split('_');
-
-				if (splitNamespace.Length != 2)
+				if (string.IsNullOrEmpty(year))
 				{
-					throw new FormatException("All day classes should be in a namespace with the format \'AdventOfCode._{year}\'");
+					Type day = GetType();
+
+					string ns = day.Namespace;
+					if (string.IsNullOrEmpty(ns)) { throw new NoNullAllowedException("All days should be in a namespace"); }
+
+					string[] splitNamespace = ns.Split('_');
+
+					if (splitNamespace.Length != 2)
+					{
+						throw new FormatException("All day classes should be in a namespace with the format \'AdventOfCode._{year}\'");
+					}
+
+					year = splitNamespace.Last();
 				}
-				
-				return splitNamespace.Last();
+
+				return year;
 			}
 		}
 
@@ -43,7 +49,7 @@ namespace AdventOfCode.Tools
 		}
 
 		//TODO: return double for timer. 
-		public virtual double Initialize() => 0;
+		public abstract double Initialize();
 
 		public abstract string StarOne();
 		public abstract string StarTwo();

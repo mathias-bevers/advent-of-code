@@ -14,7 +14,7 @@ namespace AdventOfCode._2020
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 
 			string[] file = DataRetriever.AsLines(this);
 			data = new long[file.Length];

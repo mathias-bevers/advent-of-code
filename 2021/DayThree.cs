@@ -11,7 +11,7 @@ namespace AdventOfCode._2021
 		public override double Initialize()
 		{
 			stopwatch.Start();
-			base.Initialize();
+			
 			data = DataRetriever.AsLines(this)
 				.Select(line => line.Select(character => int.Parse(character.ToString())).ToArray())
 				.ToArray();
