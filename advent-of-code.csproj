@@ -9,12 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="2022\Data\**" />
-    <EmbeddedResource Remove="2022\Data\**" />
-    <None Remove="2022\Data\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="Input\**\*.txt" />
   </ItemGroup>
 

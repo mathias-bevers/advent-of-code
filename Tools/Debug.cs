@@ -17,7 +17,7 @@ namespace AdventOfCode.Tools
 		public static void LogError(object message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string callerPath = null)
 		{
 			Console.ForegroundColor = ConsoleColor.Red;
-			string fileName = callerPath.Split('\\').Last();
+			string fileName = callerPath.Split(Path.DirectorySeparatorChar).Last();
 			Console.Write($"[ERROR {fileName}:{lineNumber}] ");
 			Console.ResetColor();
 			Console.WriteLine(message.ToString());
@@ -30,7 +30,7 @@ namespace AdventOfCode.Tools
 		public static void Log(object message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string callerPath = null)
 		{
 			Console.ForegroundColor = ConsoleColor.DarkGray;
-			string fileName = callerPath.Split('\\').Last();
+			string fileName = callerPath.Split(Path.DirectorySeparatorChar).Last();
 			Console.Write($"[INFO {fileName}:{lineNumber}] ");
 			Console.ResetColor();
 			Console.WriteLine(message.ToString());
@@ -43,7 +43,7 @@ namespace AdventOfCode.Tools
 		public static void LogWaring(object message, [CallerLineNumber] int lineNumber = 0, [CallerFilePath] string callerPath = null)
 		{
 			Console.ForegroundColor = ConsoleColor.Yellow;
-			string fileName = callerPath.Split('\\').Last();
+			string fileName = callerPath.Split(Path.DirectorySeparatorChar).Last();
 			Console.Write($"[WARNING {fileName}:{lineNumber}] ");
 			Console.ResetColor();
 			Console.WriteLine(message.ToString());

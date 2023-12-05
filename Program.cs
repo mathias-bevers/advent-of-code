@@ -7,7 +7,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        string year = "2022";
+        string year = "2023";
         if (args.Length > 0) { year = args[0]; }
 
         List<Day> days = new();

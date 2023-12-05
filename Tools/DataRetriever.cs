@@ -11,7 +11,7 @@
 		private static string GeneratePath(Day day)
 		{
 			string solutionPath = TryFindSolutionPath();
-			string path = solutionPath + $@"\Input\{day.Year}\{day.GetType().Name}.txt";
+			string path = solutionPath + $@"{Path.DirectorySeparatorChar}Input{Path.DirectorySeparatorChar}{day.Year}{Path.DirectorySeparatorChar}{day.GetType().Name}.txt";
 
 			if (File.Exists(path)) { return path; }
 
@@ -24,7 +24,7 @@
 		private static string TryFindSolutionPath(string currentPath = "")
 		{
 			DirectoryInfo directory = new DirectoryInfo(string.IsNullOrEmpty(currentPath) ? Directory.GetCurrentDirectory() : currentPath);
-			
+
 			while (directory != null)
 			{
 				if (directory.GetFiles("*.sln").Any())
