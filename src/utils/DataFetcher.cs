@@ -4,25 +4,25 @@ namespace advent_of_code.utils;
 
 internal static class DataFetcher
 {
+    private static readonly Uri BASE_ADRESS = new("https://www.adventofcode.com");
     private static string sessionID = string.Empty;
     public static bool IsValidSession => !string.IsNullOrEmpty(sessionID);
 
+
     internal static async Task<string> ReadDataAsync(this IDay day)
-    {
-        if (string.IsNullOrEmpty(sessionID))
-        {
-            throw new ArgumentNullException(nameof(sessionID), "To read the normal data, the 'sessionID' variable needs to be set.");
-        }
-
-        var url = $"https://www.adventofcode.com/{day.date.Year}/day/{day.date.Day}/input";
-
+    {    
         using HttpClientHandler handler = new() { CookieContainer = new CookieContainer() };
 
-        handler.CookieContainer.Add(new Uri("https://www.adventofcode.com/"), new Cookie("session", sessionID, "/", "adventofcode.com"));
+        handler.CookieContainer.Add(BASE_ADRESS, new Cookie("session", sessionID, "/", "adventofcode.com"));
 
         using HttpClient client = new (handler);
-        HttpResponseMessage response = await client.GetAsync(url);
+        client.BaseAddress = BASE_ADRESS;
+
+        string getUrl = $"/{day.date.Year}/day/{day.date.Day}/input";
+        HttpResponseMessage response = await client.GetAsync(getUrl);
+
         response.EnsureSuccessStatusCode();
+        
         return await response.Content.ReadAsStringAsync();
     }
 
