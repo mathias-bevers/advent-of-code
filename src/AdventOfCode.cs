@@ -35,7 +35,6 @@ public class AdventOfCode
 
 
         Stopwatch sw = new();
-        StringBuilder sb = new();
         int windowWidth = Console.WindowWidth - 2;
 
         Console.Write("advent of code ");
@@ -44,22 +43,18 @@ public class AdventOfCode
 
         for (int i = 0; i < days.Length; ++i)
         {
-            sb.Clear();
-
             IDay day = days[i];
             string dayString = day.FormatDayToString();
-            long elapsed;
-            string result;
-
+            DayCompletionRecord dcr = new();
 
             try
             {
-                sw.Restart();
                 string data = options.example ? day.ReadExample()
                     : Task.Run(day.ReadDataAsync).Result;
+                sw.Restart();
                 day.PopulateData(data);
-                elapsed = sw.ElapsedMilliseconds;
-                sb.Append($"initialized in {elapsed}ms\t\t");
+                sw.Stop();
+                dcr.initializationTime = sw.ElapsedMilliseconds;
             }
             catch (NotImplementedException)
             {
@@ -69,9 +64,10 @@ public class AdventOfCode
             try
             {
                 sw.Restart();
-                result = day.SolveStarOne();
-                elapsed = sw.ElapsedMilliseconds;
-                sb.Append($"[\u2605 1] {result.PadRight(12)}in {elapsed}ms\t\t");
+                string result = day.SolveStarOne();
+                sw.Stop();
+
+                dcr.starOne = new StarCompletionRecord(result, sw.ElapsedMilliseconds);
             }
             catch (NotImplementedException)
             {
@@ -81,16 +77,17 @@ public class AdventOfCode
             try
             {
                 sw.Restart();
-                result = day.SolveStarTwo();
-                elapsed = sw.ElapsedMilliseconds;
-                sb.Append($"[\u2605 2] {result.PadRight(12)}in {elapsed}ms");
+                string result = day.SolveStarTwo();
+                sw.Stop();
+
+                dcr.starTwo = new StarCompletionRecord(result, sw.ElapsedMilliseconds);
             }
             catch (NotImplementedException)
             {
                 Logger.Warning($"the \'SolveStarTwo\' method of day {dayString} is not implemented!");
             }
 
-            Logger.Day(dayString, sb.ToString());
+            Logger.Day(dayString, dcr);
         }
     }
 

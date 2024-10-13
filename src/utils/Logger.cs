@@ -1,7 +1,14 @@
+using System.Text;
+
 namespace advent_of_code.utils;
 
 public static class Logger
-{    
+{
+    private const byte INIT_PADDING = 25;
+    private const byte STAR_PADDING = 17;
+
+    private static readonly StringBuilder BUILDER = new();
+
     private static readonly string NORMAL = Console.IsOutputRedirected ? "" : "\x1b[39m";
     private static readonly string RED = Console.IsOutputRedirected ? "" : "\x1b[91m";
     private static readonly string GREEN = Console.IsOutputRedirected ? "" : "\x1b[92m";
@@ -25,6 +32,34 @@ public static class Logger
         Console.WriteLine($"{YELLOW}[WARN] {NORMAL}{message}");
     public static void Error(object? message) =>
         Console.WriteLine($"{RED}[ERR ] {NORMAL}{message}");
-    internal static void Day(string day, object? message) =>
-        Console.WriteLine($"{MAGENTA}[DAY ]{BOLD}[{day}] {NOBOLD}{NORMAL}{message}");
+
+    internal static void Day(string day, DayCompletionRecord record)
+    {
+        BUILDER.Append(MAGENTA);
+        BUILDER.Append("[DAY ]");
+        BUILDER.Append(BLUE);
+        BUILDER.Append($"[{day}] ");
+
+        BUILDER.Append(NORMAL);
+        // padding is with the assumption that the init time is a three digit number.
+        BUILDER.Append($"initialized in {record.initializationTime}ms".PadRight(INIT_PADDING));
+
+        BUILDER.Append(YELLOW);
+        BUILDER.Append("[\u2605 1] ");
+        BUILDER.Append(NORMAL);
+        // padding is with the assumption that the result is a max 15 chars long.
+        BUILDER.Append(record.starOne.result.PadRight(STAR_PADDING));
+        BUILDER.Append($"completed in {record.starOne.completionTime.ToString().PadLeft(3)}ms");
+
+        BUILDER.Append(YELLOW);
+        BUILDER.Append(" [\u2605 2] ");
+        BUILDER.Append(NORMAL);
+        // padding is with the assumption that the result is a max 15 chars long.
+        BUILDER.Append(record.starTwo.result.PadRight(STAR_PADDING));
+        BUILDER.Append($"completed in {record.starTwo.completionTime.ToString().PadLeft(3)}ms");
+
+
+        Console.WriteLine(BUILDER.ToString());
+        BUILDER.Clear();
+    }
 }
