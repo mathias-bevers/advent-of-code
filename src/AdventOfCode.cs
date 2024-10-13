@@ -1,7 +1,6 @@
+using advent_of_code.utils;
 using System.Diagnostics;
 using System.Reflection;
-using advent_of_code.utils;
-using System.Text;
 using CommandLine;
 
 namespace advent_of_code;

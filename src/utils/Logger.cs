@@ -5,7 +5,7 @@ namespace advent_of_code.utils;
 public static class Logger
 {
     private const byte INIT_PADDING = 25;
-    private const byte STAR_PADDING = 17;
+    private const byte STAR_PADDING = 27;
 
     private static readonly StringBuilder BUILDER = new();
 
@@ -47,14 +47,14 @@ public static class Logger
         BUILDER.Append(YELLOW);
         BUILDER.Append("[\u2605 1] ");
         BUILDER.Append(NORMAL);
-        // padding is with the assumption that the result is a max 15 chars long.
+        // padding is with the assumption that the result is a max 27 chars long.
         BUILDER.Append(record.starOne.result.PadRight(STAR_PADDING));
         BUILDER.Append($"completed in {record.starOne.completionTime.ToString().PadLeft(3)}ms");
 
         BUILDER.Append(YELLOW);
         BUILDER.Append(" [\u2605 2] ");
         BUILDER.Append(NORMAL);
-        // padding is with the assumption that the result is a max 15 chars long.
+        // padding is with the assumption that the result is a max 27 chars long.
         BUILDER.Append(record.starTwo.result.PadRight(STAR_PADDING));
         BUILDER.Append($"completed in {record.starTwo.completionTime.ToString().PadLeft(3)}ms");
 
