@@ -1,4 +1,6 @@
-﻿namespace advent_of_code.days;
+﻿using advent_of_code.utils;
+
+namespace advent_of_code.days;
 
 public class Day0222 : IDay
 {
@@ -12,7 +14,7 @@ public class Day0222 : IDay
     public readonly Shape ROCK = new(1, 'A', 'X');
     public readonly Shape SCISSORS = new(3, 'C', 'Z');
 
-    private List<(char, char)> data = new();
+    private readonly List<(char, char)> data = [];
 
     public void PopulateData(string raw)
     {
@@ -109,17 +111,10 @@ public class Day0222 : IDay
         return totalScore.ToString();
     }
 
-    public struct Shape
+    public readonly struct Shape(int value, char opponent, char response)
     {
-        public char Opponent { get; }
-        public char Response { get; }
-        public int Value { get; }
-
-        public Shape(int value, char opponent, char response)
-        {
-            Value = value;
-            Opponent = opponent;
-            Response = response;
-        }
+        public char Opponent { get; } = opponent;
+        public char Response { get; } = response;
+        public int Value { get; } = value;
     }
 }

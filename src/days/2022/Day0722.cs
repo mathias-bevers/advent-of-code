@@ -1,4 +1,6 @@
-﻿namespace advent_of_code.days;
+﻿using advent_of_code.utils;
+
+namespace advent_of_code.days;
 
 public class Day0722 : IDay
 {

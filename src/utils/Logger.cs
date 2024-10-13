@@ -1,3 +1,5 @@
+namespace advent_of_code.utils;
+
 public static class Logger
 {    
     private static readonly string NORMAL = Console.IsOutputRedirected ? "" : "\x1b[39m";
