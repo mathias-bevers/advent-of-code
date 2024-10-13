@@ -50,6 +50,13 @@ public class AdventOfCode
             {
                 string data = options.example ? day.ReadExample()
                     : Task.Run(day.ReadDataAsync).Result;
+
+                if(string.IsNullOrEmpty(data))
+                {
+                    Logger.Error($"the loaded data for {dayString} is null.");
+                    return;
+                }
+
                 sw.Restart();
                 day.PopulateData(data);
                 sw.Stop();
@@ -150,7 +157,6 @@ public class AdventOfCode
 
         [Option('y', "year", HelpText = "Specify a specific year to run, when not specified only this year is ran")]
         public int year { get; set; } = DateTime.Now.Year;
-
 
         public override string ToString()
         {

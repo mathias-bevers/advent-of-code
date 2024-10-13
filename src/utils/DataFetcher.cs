@@ -16,7 +16,7 @@ internal static class DataFetcher
     {
         if (client is null || handler is null)
         {
-            throw new NullReferenceException("Make sure the initialize method is called first");
+            throw new NullReferenceException("make sure the initialize method is called first");
         }
 
         string getUrl = $"/{day.date.Year}/day/{day.date.Day}/input";
@@ -29,13 +29,16 @@ internal static class DataFetcher
 
     internal static string ReadExample(this IDay day)
     {
-        string fileName = day.FormatDayToString() + ".txt";
-        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "example", fileName);
+        string fileName = day.date.ToString("yyyy-dd") + ".txt";
+        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "examples", fileName);
 
         if (!File.Exists(filePath))
         {
             Logger.Error($"the file \'{fileName}\' does not exist, creating...");
-            File.Create(filePath);
+
+            try{ File.Create(filePath); }
+            catch(DirectoryNotFoundException exception) { Logger.Error(exception.Message); }
+            
             return string.Empty;
         }
 
@@ -49,7 +52,7 @@ internal static class DataFetcher
 
         if (!File.Exists(filePath))
         {
-            Logger.Error($"the file \'{filePath}\' does not exist, creating...");
+            Logger.Warning($"the file \'{filePath}\' does not exist, creating...");
             File.Create(filePath);
             return;
         }

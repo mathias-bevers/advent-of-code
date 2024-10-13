@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace advent_of_code.utils;
 
 public struct Vector2
@@ -48,4 +50,7 @@ public struct Vector2Int
     {
         return new Vector2Int(a.x - b.x, a.y - b.y);
     }
+
+    public static bool operator ==(Vector2Int a, Vector2Int b) => a.x == b.x && a.y == b.y;
+    public static bool operator !=(Vector2Int a, Vector2Int b) => a.x != b.x || a.y != b.y;
 }

@@ -6,14 +6,14 @@ public class Day0521 : IDay
 {
     public DateTime date { get; } = new(2021, 12, 05);
 
-    private readonly int[,] grid = new int[991, 989];
-    //private readonly int[,] grid = new int[10, 10];
+    private int[,] grid = new int[0, 0];
     private Line[] lines = [];
 
     public void PopulateData(string raw)
     {
         List<Line> lineList = [];
-		string[] dataLines = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
+        string[] dataLines = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
+        grid = dataLines.Length == 10 ? new int[10, 10] : new int[991, 990];
 
         foreach (string asLine in dataLines)
         {
@@ -23,16 +23,11 @@ public class Day0521 : IDay
 
             Vector2Int startPoint = new(int.Parse(start[0]), int.Parse(start[1]));
             Vector2Int endPoint = new(int.Parse(end[0]), int.Parse(end[1]));
-            float differenceAngle = (float)((startPoint - endPoint).angle * 180 / Math.PI);
+            double differenceAngle = (endPoint - startPoint).angle * 180 / Math.PI;
 
-            if (startPoint.x == endPoint.x || startPoint.y == endPoint.y)
-            {
-                lineList.Add(new Line(new Vector2Int(startPoint.x, startPoint.y), new Vector2Int(endPoint.x, endPoint.y), false));
-            }
-            else if (differenceAngle == 45.0f)
-            {
-                lineList.Add(new Line(new Vector2Int(startPoint.x, startPoint.y), new Vector2Int(endPoint.x, endPoint.y), true));
-            }
+            lineList.Add(new Line(new Vector2Int(startPoint.x, startPoint.y),
+                    new Vector2Int(endPoint.x, endPoint.y),
+                    (int)Math.Round(differenceAngle)));
         }
 
         lines = [.. lineList];
@@ -47,13 +42,11 @@ public class Day0521 : IDay
                 case Line.Direction.Horizontal:
                     {
                         for (int x = line.Start.x; x <= line.End.x; ++x) { ++grid[x, line.Start.y]; }
-
                         break;
                     }
                 case Line.Direction.Vertical:
                     {
                         for (int y = line.Start.y; y <= line.End.y; ++y) { ++grid[line.Start.x, y]; }
-
                         break;
                     }
                 case Line.Direction.Diagonal: continue;
@@ -66,24 +59,29 @@ public class Day0521 : IDay
 
     public string SolveStarTwo()
     {
-        int[,] grid = new int[10, 10];
-
         foreach (Line line in lines.Where(l => l.Dir == Line.Direction.Diagonal))
         {
-            for (int y = line.Start.y; y <= line.End.y; ++y)
-                for (int x = line.Start.x; x <= line.End.x; ++x)
-                {
-                    if (y != x) { continue; }
+            Vector2Int min = new(Math.Min(line.Start.x, line.End.x), Math.Min(line.Start.y, line.End.y));
+            Vector2Int max = new(Math.Max(line.Start.x, line.End.x), Math.Max(line.Start.y, line.End.y));
 
+            for (int y = min.y; y <= max.y; ++y)
+            {
+                for (int x = min.x; x <= max.x; ++x)
+                {
+                    Vector2Int currentPosition = new(x, y);
+
+                    if(currentPosition == line.Start || currentPosition == line.End) 
+                    {
+                        ++grid[x,y];
+                        continue;
+                    }
+
+                    int differenceAngle = (int)Math.Round((currentPosition - line.Start).angle
+                        * 180 / Math.PI);
+
+                    if (differenceAngle != line.DifferenceAngle) { continue; }
                     ++grid[x, y];
                 }
-        }
-
-        for (int y = 0; y < grid.GetLength(0); ++y)
-        {
-            for (int x = 0; x < grid.GetLength(0); ++x)
-            {
-                
             }
         }
 
@@ -102,10 +100,14 @@ public class Day0521 : IDay
         public Direction Dir { get; }
         public Vector2Int End { get; }
         public Vector2Int Start { get; }
+        public int DifferenceAngle { get; }
 
-        public Line(Vector2Int start, Vector2Int end, bool isDiagonal)
+
+        public Line(Vector2Int start, Vector2Int end, int differenceAngle)
         {
-            if (isDiagonal)
+            DifferenceAngle = differenceAngle;
+            int positiveDifferenceAngle = Math.Abs(differenceAngle);
+            if (positiveDifferenceAngle == 45 || positiveDifferenceAngle == 135)
             {
                 Dir = Direction.Diagonal;
 

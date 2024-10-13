@@ -3,10 +3,11 @@ namespace advent_of_code.days;
 public class Day0920 : IDay
 {
     public DateTime date { get; } = new(2020, 12, 09);
-    
-	private const int PREAMBLE = 25;
+
+	private int preamble = -1;
     private long invalidValue = 0;
     private long invalidIndex = 0;
+    private bool isExampleMode;
 
     private long[] data = [];
 
@@ -15,12 +16,16 @@ public class Day0920 : IDay
         string[] file = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
         data = new long[file.Length];
 
+        isExampleMode = file.Length == 20;
+        preamble = isExampleMode ? 5 : 25;
+
         for (int i = 0; i < file.Length; i++) { data[i] = long.Parse(file[i]); }
+
     }
 
     public string SolveStarOne()
     {
-        for (int i = PREAMBLE; i < data.Length; i++)
+        for (int i = preamble; i < data.Length; i++)
         {
             if (!IsValid(i))
             {
@@ -34,9 +39,9 @@ public class Day0920 : IDay
         {
             List<long> combinations = [];
 
-            for (int i = toCheck - PREAMBLE; i < toCheck; i++)
+            for (int i = toCheck - preamble; i < toCheck; i++)
             {
-                for (int j = toCheck - PREAMBLE; j < toCheck; j++)
+                for (int j = toCheck - preamble; j < toCheck; j++)
                 {
                     if (i == j) { continue; }
 

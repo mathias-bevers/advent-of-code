@@ -7,7 +7,8 @@ internal class Day0123 : IDay
 {
     public DateTime date => new(2023, 12, 01);
 
-    private string[] data = [];
+    private bool isExampleMode = false;
+    private string[][] data = new string[2][];
     private readonly Dictionary<string, int> spelledOut = new(){
             {"one", 1},
             {"two", 2},
@@ -22,14 +23,20 @@ internal class Day0123 : IDay
 
     public void PopulateData(string raw)
     {
-        data = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
+        string[] chunks = raw.Split(Utils.EXAMPLE_SPLIT, StringSplitOptions.RemoveEmptyEntries);
+        data[0] = chunks[0].Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
+
+        if (chunks.Length < 2) { return; }
+
+        isExampleMode = true;
+        data[1] = chunks[1].Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
     }
 
     public string SolveStarOne()
     {
         int sum = 0;
 
-        foreach (string line in data)
+        foreach (string line in data[0])
         {
             string number = string.Empty;
 
@@ -59,13 +66,14 @@ internal class Day0123 : IDay
     public string SolveStarTwo()
     {
         int sum = 0;
+        int arrayIndex = isExampleMode ? 1 : 0;
         const string matchString = "[1-9]|one|two|three|four|five|six|seven|eight|nine";
         Regex startToEnd = new(matchString);
         Regex endToStart = new(matchString, RegexOptions.RightToLeft);
 
-        for (int i = 0; i < data.Length; ++i)
+        for (int i = 0; i < data[arrayIndex].Length; ++i)
         {
-            string line = data[i];
+            string line = data[arrayIndex][i];
 
             string first = startToEnd.Matches(line).First().Value;
             if (first.Length > 1) { first = spelledOut[first].ToString(); }

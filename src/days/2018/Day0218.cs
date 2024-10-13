@@ -4,11 +4,19 @@ public class DayTwo : IDay
 {
     public DateTime date { get; } = new(2018, 12, 02);
 
-    private string[] boxIDs = [];
+    private readonly string[][] boxIDs = new string[2][];
+    bool isExampleMode = false;
 
     public void PopulateData(string raw)
     {
-        boxIDs = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
+        string[] chunks = raw.Split(Utils.EXAMPLE_SPLIT);
+
+        boxIDs[0] = chunks[0].Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
+
+        if (chunks.Length <= 1) { return; }
+
+        isExampleMode = true;
+        boxIDs[1] = chunks[1].Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
     }
 
     public string SolveStarOne()
@@ -16,15 +24,15 @@ public class DayTwo : IDay
         int doubles = 0;
         int triples = 0;
 
-        foreach (string boxID in boxIDs)
+        foreach (string boxID in boxIDs[0])
         {
-            Dictionary<char, int> charOccurrences = new();
+            Dictionary<char, int> charOccurrences = [];
 
             foreach (char letter in boxID)
             {
-                if (charOccurrences.ContainsKey(letter))
+                if (charOccurrences.TryGetValue(letter, out int value))
                 {
-                    ++charOccurrences[letter];
+                    charOccurrences[letter] = ++value;
                     continue;
                 }
 
@@ -61,18 +69,26 @@ public class DayTwo : IDay
 
     public string SolveStarTwo()
     {
-        for (int i = 0; i < boxIDs.Length; ++i)
-        {
-            string boxID1 = boxIDs[i];
+        int arrayIndex = isExampleMode ? 1 : 0;
+        int threshhold = boxIDs[arrayIndex][0].Length - 1;
 
-            for (int j = 0; j < boxIDs.Length; ++j)
+        for (int i = 0; i < boxIDs[arrayIndex].Length; ++i)
+        {
+            string boxID1 = boxIDs[arrayIndex][i];
+
+            for (int j = 0; j < boxIDs[arrayIndex].Length; ++j)
             {
                 if (i == j) { continue; }
 
-                string boxID2 = boxIDs[j];
+                string boxID2 = boxIDs[arrayIndex][j];
 
-                List<char> similarCharacters = boxID1.Where((character, k) => character == boxID2[k]).ToList();
-                if (similarCharacters.Count >= 25) { return string.Join(null, similarCharacters); }
+                List<char> similarCharacters =
+                    boxID1.Where((character, k) => character == boxID2[k]).ToList();
+
+                if (similarCharacters.Count >= threshhold)
+                {
+                    return string.Join(null, similarCharacters);
+                }
             }
         }
 
