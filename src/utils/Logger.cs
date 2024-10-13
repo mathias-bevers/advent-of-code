@@ -24,5 +24,5 @@ public static class Logger
     public static void Error(object? message) =>
         Console.WriteLine($"{RED}[ERR ] {NORMAL}{message}");
     internal static void Day(string day, object? message) =>
-        Console.WriteLine($"{MAGENTA}[DAY ] {NORMAL}{message}");
+        Console.WriteLine($"{MAGENTA}[DAY ]{BOLD}[{day}] {NOBOLD}{NORMAL}{message}");
 }

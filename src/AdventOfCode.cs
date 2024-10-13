@@ -19,29 +19,19 @@ public class AdventOfCode
         {
             if (options.today) { days = [GetDay(DateTime.Today)]; }
             else if (options.day > 0) { days = [GetDay(new DateTime(options.year, 12, options.day))]; }
-            else { days = GetDayRange(options.all, options.year).ToArray(); }
+            else { days = [.. GetDayRange(options.all, options.year)]; }
         }
-        catch (Exception exception)
-        {
-            Logger.Error(exception.Message);
-        }
+        catch (Exception exception) { Logger.Error(exception.Message); }
 
-        DataFetcher.SetSessionID();
+        try { DataFetcher.Initialize(); }
+        catch (Exception exception) { Logger.Error(exception.Message); }
     }
 
     public void Run()
     {
-        if (days.Length < 1)
-        {
-            Logger.Error($"No days are initialized with the options:\t {options}");
-            return;
-        }
+        if (days.Length < 1) { return; }
 
-        if(!DataFetcher.IsValidSession)
-        {
-            Logger.Error($"The session id is not set correctly!");
-            return;
-        }
+        if (!DataFetcher.IsInitialized) { return; }
 
 
         Stopwatch sw = new();
@@ -81,7 +71,7 @@ public class AdventOfCode
                 sw.Restart();
                 result = day.SolveStarOne();
                 elapsed = sw.ElapsedMilliseconds;
-                sb.Append($"[\u2605 1] {result} in {elapsed}ms\t\t");
+                sb.Append($"[\u2605 1] {result.PadRight(12)}in {elapsed}ms\t\t");
             }
             catch (NotImplementedException)
             {
@@ -93,7 +83,7 @@ public class AdventOfCode
                 sw.Restart();
                 result = day.SolveStarTwo();
                 elapsed = sw.ElapsedMilliseconds;
-                sb.Append($"[\u2605 2] {result} in {elapsed}ms");
+                sb.Append($"[\u2605 2] {result.PadRight(12)}in {elapsed}ms");
             }
             catch (NotImplementedException)
             {
