@@ -93,6 +93,12 @@ public class AdventOfCode
                 Logger.Warning($"the \'SolveStarTwo\' method of day {dayString} is not implemented!");
             }
 
+            if(!dcr.isInitialized)
+            {
+                Logger.Error($"the {nameof(DayCompletionRecord)} is not initialized correctly!");
+                return;
+            } 
+
             Logger.Day(dayString, dcr);
         }
     }
