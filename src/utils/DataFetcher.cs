@@ -22,9 +22,17 @@ internal static class DataFetcher
         string getUrl = $"/{day.date.Year}/day/{day.date.Day}/input";
         HttpResponseMessage response = await client.GetAsync(getUrl);
 
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
 
-        return await response.Content.ReadAsStringAsync();
+        }
+        catch(HttpRequestException e)
+        {
+            Logger.Error(e.Message);
+            return string.Empty;
+        }
     }
 
     internal static string ReadExample(this IDay day)
@@ -36,9 +44,9 @@ internal static class DataFetcher
         {
             Logger.Error($"the file \'{fileName}\' does not exist, creating...");
 
-            try{ File.Create(filePath); }
-            catch(DirectoryNotFoundException exception) { Logger.Error(exception.Message); }
-            
+            try { File.Create(filePath); }
+            catch (DirectoryNotFoundException exception) { Logger.Error(exception.Message); }
+
             return string.Empty;
         }
 
