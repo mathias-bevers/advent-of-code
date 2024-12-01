@@ -1,6 +1,4 @@
 
-using advent_of_code.utils;
-
 namespace advent_of_code.days;
 
 internal class Day0124 : IDay
@@ -40,6 +38,21 @@ internal class Day0124 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        int simmularityScore = 0;
+
+        for (int i = 0; i < data[0].Length; ++i)
+        {
+            int occurance = 0;
+            for (int ii = 0; ii < data[1].Length; ++ii)
+            {
+                if (data[0][i] != data[1][ii]) { continue; }
+
+                ++occurance;
+            }
+
+            simmularityScore += data[0][i] * occurance;
+        }
+
+        return simmularityScore.ToString();
     }
 }
