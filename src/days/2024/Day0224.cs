@@ -71,26 +71,30 @@ internal class Day0224 : IDay
                 continue;
             }
 
-
-            for (int ii = 1; ii < data[i].Length - 1; ++ii)
+            for (int ii = 0; ii < data[i].Length; ++ii)
             {
+                List<int> copy = [.. data[i]];
+                copy.RemoveAt(ii);
+                isIncline = null;
                 isSave = true;
-                for (int iii = 0; iii < data[i].Length - 1; ++iii)
+
+                for (int iii = 0; iii < copy.Count - 1; ++iii)
                 {
-                    int right = ii == iii ? iii - 1 : iii;
-                    if (!IsSafeDifference(data[i][iii + 1], data[i][right], ref isIncline))
+                    if (!IsSafeDifference(copy[iii + 1], copy[iii], ref isIncline))
                     {
                         isSave = false;
                         break;
                     }
                 }
 
-                if (isSave) { break; }
+                if(!isSave)
+                {
+                    continue;
+                }
+
+                ++saveLevels;
+                break;
             }
-
-            if (!isSave) { continue; }
-
-            ++saveLevels;
         }
 
         return saveLevels.ToString();
