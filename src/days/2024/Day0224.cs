@@ -7,27 +7,60 @@ internal class Day0224 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 02);
 
-    private int[,] data = new int[0, 0];
+    private int[][] data = new int[0][];
 
     public void PopulateData(string raw)
     {
         string[] levels = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
-        string[] tmp = levels[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        data = new int[tmp.Length, levels.Length];
+        data = new int[levels.Length][];
 
-        for (int y = 0; y < data.GetLength(1); ++y)
+        for (int i = 0; i < data.Length; ++i)
         {
-            string[] levelValues = levels[y].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            for (int x = 0; x < data.GetLength(0); ++x)
+            string[] levelValues = levels[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            data[i] = new int[levelValues.Length];
+            for (int ii = 0; ii < levelValues.Length; ++ii)
             {
-                data[x,y] = int.Parse(levelValues[x]);
+                data[i][ii] = int.Parse(levelValues[ii]);
             }
         }
     }
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        int saveLevels = 0;
+        for (int i = 0; i < data.Length; ++i)
+        {
+            bool isSave = true;
+            bool? isIncline = null;
+            for (int ii = 0; ii < data[i].Length - 1; ++ii)
+            {
+                int difference = data[i][ii + 1] - data[i][ii];
+                int absoluteDifference = Math.Abs(difference);
+
+                if (absoluteDifference < 1 || absoluteDifference > 3)
+                {
+                    isSave = false;
+                    break;
+                }
+
+                if (!isIncline.HasValue)
+                {
+                    isIncline = difference > 0;
+                    continue;
+                }
+
+                if (isIncline.Value && difference < 0)
+                {
+                    isSave = false;
+                    break;
+                }
+            }
+
+            if (!isSave) { continue; }
+            ++saveLevels;
+        }
+
+        return saveLevels.ToString();
     }
 
     public string SolveStarTwo()
