@@ -1,0 +1,15 @@
+abcdef
+bababc
+abbcde
+abcccd
+aabcdd
+abcdee
+ababab
+------------------------------------$example_split$
+abcde
+fghij
+klmno
+pqrst
+fguij
+axcye
+wvxyz
