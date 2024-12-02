@@ -49,10 +49,21 @@ internal class Day0224 : IDay
                     continue;
                 }
 
-                if (isIncline.Value && difference < 0)
+                if (isIncline.Value)
                 {
-                    isSave = false;
-                    break;
+                    if (difference < 0)
+                    {
+                        isSave = false;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (difference > 0)
+                    {
+                        isSave = false;
+                        break;
+                    }
                 }
             }
 
