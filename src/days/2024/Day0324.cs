@@ -21,7 +21,19 @@ internal class Day0324 : IDay
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        int instructionSum = 0;
+
+        for(int i = 0; i < multiplications.Length; ++i)
+        {
+            string multiplication = multiplications[i];
+            multiplication = multiplication[4..];
+            multiplication = multiplication[..^1];
+
+            string[] digits = multiplication.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            instructionSum += int.Parse(digits[0]) * int.Parse(digits[1]);
+        }
+
+        return instructionSum.ToString();
     }
 
     public string SolveStarTwo()
