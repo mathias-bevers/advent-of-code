@@ -46,10 +46,17 @@ public struct Vector2Int
 
     public Vector2Int() => x = y = 0;
 
+    public static Vector2Int operator +(Vector2Int a, Vector2Int b)
+    {
+        return new Vector2Int(a.x + b.x, a.y + b.y);
+    }
+
     public static Vector2Int operator -(Vector2Int a, Vector2Int b)
     {
         return new Vector2Int(a.x - b.x, a.y - b.y);
     }
+
+    public static Vector2Int operator *(Vector2Int v, int i) => new(v.x * i, v.y * i);
 
     public static bool operator ==(Vector2Int a, Vector2Int b) => a.x == b.x && a.y == b.y;
     public static bool operator !=(Vector2Int a, Vector2Int b) => a.x != b.x || a.y != b.y;
