@@ -20,7 +20,7 @@ internal class Day0424 : IDay
         new Vector2Int(-1,0),
         new Vector2Int(-1,1)
     };
-    
+
     public void PopulateData(string raw)
     {
         string[] rows = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
@@ -66,7 +66,7 @@ internal class Day0424 : IDay
                             break;
                         }
 
-                        if(grid[position.x, position.y] != searchingCharacters[ii])
+                        if (grid[position.x, position.y] != searchingCharacters[ii])
                         {
                             isValid = false;
                             break;
@@ -84,6 +84,40 @@ internal class Day0424 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        int occurance = 0;
+        for (int y = 0; y < grid.GetLength(1); ++y)
+        {
+            for (int x = 0; x < grid.GetLength(0); ++x)
+            {
+                if (grid[x, y] != 'A') { continue; }
+
+                Vector2Int origin = new(x, y);
+                string s = string.Empty;
+
+                for (int i = 1; i < directions.Length; i += 2)
+                {
+                    Vector2Int position = origin + directions[i];
+
+                    if (position.x < 0 || position.x >= grid.GetLength(0)) { break; }
+
+                    if (position.y < 0 || position.y >= grid.GetLength(1)) { break; }
+
+                    char current = grid[position.x, position.y];
+
+                    if (current != 'M' && current != 'S') { break; }
+
+                    s += current;
+                }
+
+                if (s.Length != 4) { continue; }
+
+                if (s[0] == s[2] || s[1] == s[3]) { continue; }
+
+                // if (s.Count(c => c == 'M') != 2 || s.Count(c => c == 'S') != 2) { continue; }
+
+                ++occurance;
+            }
+        }
+        return occurance.ToString();
     }
 }
