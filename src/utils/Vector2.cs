@@ -53,4 +53,15 @@ public struct Vector2Int
 
     public static bool operator ==(Vector2Int a, Vector2Int b) => a.x == b.x && a.y == b.y;
     public static bool operator !=(Vector2Int a, Vector2Int b) => a.x != b.x || a.y != b.y;
+
+    public override readonly int GetHashCode() => HashCode.Combine(x, y);
+    public override readonly bool Equals(object? obj)
+    {
+        if (obj is null) { return false; }
+
+        if (obj is not Vector2Int other) { return false; }
+
+        return x == other.x && y == other.y;
+    }
+
 }
