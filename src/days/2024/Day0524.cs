@@ -89,18 +89,17 @@ internal class Day0524 : IDay
         for (int i = 0; i < invalidSequenceIndexes.Length; ++i)
         {
             int[] sequence = updateSequences[invalidSequenceIndexes[i]];
-            bool isValid = true;
+            bool isValid, isChanged;
 
-            for (int ii = 0; ii < sequence.Length; ++ii)
+            do
             {
-                int current = sequence[ii];
-                Rule[] applyingRules = Array.FindAll(rules, r => r.before == current);
+                isValid = true;
+                isChanged = false;
 
-                bool isChanged;
-                do
+                for (int ii = 0; ii < sequence.Length; ++ii)
                 {
-                    isValid = true;
-                    isChanged = false;
+                    int current = sequence[ii];
+                    Rule[] applyingRules = Array.FindAll(rules, r => r.before == current);
 
                     for (int iii = 0; iii < applyingRules.Length; ++iii)
                     {
@@ -120,8 +119,8 @@ internal class Day0524 : IDay
                         break;
                     }
                 }
-                while (!isValid && isChanged);
             }
+            while (!isValid && isChanged);
 
             if (!isValid) { continue; }
 
