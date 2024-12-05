@@ -40,7 +40,40 @@ internal class Day0524 : IDay
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        int middleSum = 0;
+
+        for (int i = 0; i < updateSequences.Length; ++i)
+        {
+            bool isValid = true;
+
+            for (int ii = 0; ii < updateSequences[i].Length; ++ii)
+            {
+                int current = updateSequences[i][ii];
+                (int before, int after)[] applyingRules =
+                    Array.FindAll(rules, (r => r.before == current));
+
+                for (int iii = 0; iii < applyingRules.Length; ++iii)
+                {
+                    int index =
+                        Array.FindIndex(updateSequences[i], x => x == applyingRules[iii].after);
+
+                    if (index < 0) { continue; }
+
+                    if (index >= ii) { continue; }
+
+                    isValid = false;
+                    break;
+                }
+
+                if (!isValid) { break; }
+            }
+
+            if (!isValid) { continue; }
+
+            middleSum += updateSequences[i][updateSequences[i].Length / 2];
+        }
+
+        return middleSum.ToString();
     }
 
     public string SolveStarTwo()
