@@ -1,3 +1,5 @@
+using Rule = (int before, int after);
+
 
 namespace advent_of_code.days;
 
@@ -5,8 +7,9 @@ internal class Day0524 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 05);
 
-    private (int before, int after)[] rules = [];
+    private Rule[] rules = [];
     private int[][] updateSequences = [];
+    private int[] invalidSequenceIndexes = [];
 
     public void PopulateData(string raw)
     {
@@ -14,7 +17,7 @@ internal class Day0524 : IDay
 
         string[] rawRules = chunks[0].Split(Utils.NEW_LINES,
             StringSplitOptions.RemoveEmptyEntries);
-        rules = new (int, int)[rawRules.Length];
+        rules = new Rule[rawRules.Length];
 
         for (int i = 0; i < rules.Length; ++i)
         {
@@ -41,6 +44,7 @@ internal class Day0524 : IDay
     public string SolveStarOne()
     {
         int middleSum = 0;
+        List<int> tmp = new(updateSequences.Length);
 
         for (int i = 0; i < updateSequences.Length; ++i)
         {
@@ -49,8 +53,7 @@ internal class Day0524 : IDay
             for (int ii = 0; ii < updateSequences[i].Length; ++ii)
             {
                 int current = updateSequences[i][ii];
-                (int before, int after)[] applyingRules =
-                    Array.FindAll(rules, (r => r.before == current));
+                Rule[] applyingRules = Array.FindAll(rules, r => r.before == current);
 
                 for (int iii = 0; iii < applyingRules.Length; ++iii)
                 {
@@ -62,6 +65,7 @@ internal class Day0524 : IDay
                     if (index >= ii) { continue; }
 
                     isValid = false;
+                    tmp.Add(i);
                     break;
                 }
 
@@ -73,11 +77,57 @@ internal class Day0524 : IDay
             middleSum += updateSequences[i][updateSequences[i].Length / 2];
         }
 
+        invalidSequenceIndexes = [.. tmp];
+
         return middleSum.ToString();
     }
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        int middleSum = 0;
+
+        for (int i = 0; i < invalidSequenceIndexes.Length; ++i)
+        {
+            int[] sequence = updateSequences[invalidSequenceIndexes[i]];
+            bool isValid = true;
+
+            for (int ii = 0; ii < sequence.Length; ++ii)
+            {
+                int current = sequence[ii];
+                Rule[] applyingRules = Array.FindAll(rules, r => r.before == current);
+
+                bool isChanged;
+                do
+                {
+                    isValid = true;
+                    isChanged = false;
+
+                    for (int iii = 0; iii < applyingRules.Length; ++iii)
+                    {
+                        int index = Array.FindIndex(sequence, x => x == applyingRules[iii].after);
+
+                        if (index < 0) { continue; }
+
+                        if (index >= ii) { continue; }
+
+                        isValid = false;
+
+                        sequence[ii] = sequence[index];
+                        sequence[index] = current;
+
+                        isChanged = true;
+
+                        break;
+                    }
+                }
+                while (!isValid && isChanged);
+            }
+
+            if (!isValid) { continue; }
+
+            middleSum += sequence[sequence.Length / 2];
+        }
+
+        return middleSum.ToString();
     }
 }
