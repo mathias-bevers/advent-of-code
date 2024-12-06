@@ -37,8 +37,9 @@ internal static class DataFetcher
 
     internal static string ReadExample(this IDay day)
     {
-        string fileName = day.date.ToString("yyyy-dd") + ".txt";
-        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "examples", fileName);
+        string fileName = $"day-{day.date.Day:D2}.example";
+        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "examples", 
+            day.date.Year.ToString(), fileName);
 
         if (!File.Exists(filePath))
         {
