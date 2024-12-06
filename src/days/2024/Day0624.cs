@@ -93,7 +93,7 @@ internal class Day0624 : IDay
     {
         int infinites = 0;
 
-        for (int y = origin.y; y < map.GetLength(1); ++y)
+        for (int y = 0; y < map.GetLength(1); ++y)
         {
             for (int x = 0; x < map.GetLength(0); ++x)
             {
