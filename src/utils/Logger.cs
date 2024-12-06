@@ -24,6 +24,9 @@ public static class Logger
     private static readonly string REVERSE = Console.IsOutputRedirected ? "" : "\x1b[7m";
     private static readonly string NOREVERSE = Console.IsOutputRedirected ? "" : "\x1b[27m";
 
+    private static readonly string LOG_PATH =
+        Path.Join(Directory.GetCurrentDirectory(), "aoc.log");
+
 
 
     public static void Info(object? message) =>
@@ -63,5 +66,18 @@ public static class Logger
 
         Console.WriteLine(BUILDER.ToString());
         BUILDER.Clear();
+    }
+
+    public static void WriteToLogFile(string content)
+    {
+        try
+        {
+            File.WriteAllText(LOG_PATH, content);
+            Info("written log to: " + LOG_PATH);
+        }
+        catch (Exception e)
+        {
+            Error("something went wrong while writing log file: \n\t" + e.Message);
+        }
     }
 }
