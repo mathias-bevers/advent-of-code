@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "AOC run example",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
@@ -14,6 +14,24 @@
                 // "-a",
                 "-t",
                 "-e",
+                // "-y",
+                // "2021",
+                // "-d",
+                // "5"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "AOC run puzzle",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/advent_of_code.dll",
+            "args": [
+                // "-a",
+                "-t",
                 // "-y",
                 // "2021",
                 // "-d",

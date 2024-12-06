@@ -27,7 +27,7 @@ public struct Vector2Int
 
     public float angle
     {
-        get => (float)Math.Atan2(y, x);
+        readonly get => (float)Math.Atan2(y, x);
         set
         {
             float length = magnitude;
@@ -46,15 +46,27 @@ public struct Vector2Int
 
     public Vector2Int() => x = y = 0;
 
+    public void RotateDegrees(float degrees) => angle += (float)(degrees * Math.PI / 180.0f);
+
+
+    public static Vector2Int operator +(Vector2Int a, Vector2Int b)
+    {
+        return new Vector2Int(a.x + b.x, a.y + b.y);
+    }
+
     public static Vector2Int operator -(Vector2Int a, Vector2Int b)
     {
         return new Vector2Int(a.x - b.x, a.y - b.y);
     }
 
+    public static Vector2Int operator *(Vector2Int v, int i) => new(v.x * i, v.y * i);
+
     public static bool operator ==(Vector2Int a, Vector2Int b) => a.x == b.x && a.y == b.y;
+
     public static bool operator !=(Vector2Int a, Vector2Int b) => a.x != b.x || a.y != b.y;
 
     public override readonly int GetHashCode() => HashCode.Combine(x, y);
+
     public override readonly bool Equals(object? obj)
     {
         if (obj is null) { return false; }
