@@ -1,6 +1,5 @@
 using Rule = (int before, int after);
 
-
 namespace advent_of_code.days;
 
 internal class Day0524 : IDay
@@ -53,12 +52,12 @@ internal class Day0524 : IDay
             for (int ii = 0; ii < updateSequences[i].Length; ++ii)
             {
                 int current = updateSequences[i][ii];
-                Rule[] applyingRules = Array.FindAll(rules, r => r.before == current);
 
-                for (int iii = 0; iii < applyingRules.Length; ++iii)
+                for (int iii = 0; iii < rules.Length; ++iii)
                 {
-                    int index =
-                        Array.FindIndex(updateSequences[i], x => x == applyingRules[iii].after);
+                    if (rules[iii].before != current) { continue; }
+
+                    int index = FindInSequence(updateSequences[i], rules[iii].after);
 
                     if (index < 0) { continue; }
 
@@ -99,11 +98,12 @@ internal class Day0524 : IDay
                 for (int ii = 0; ii < sequence.Length; ++ii)
                 {
                     int current = sequence[ii];
-                    Rule[] applyingRules = Array.FindAll(rules, r => r.before == current);
 
-                    for (int iii = 0; iii < applyingRules.Length; ++iii)
+                    for (int iii = 0; iii < rules.Length; ++iii)
                     {
-                        int index = Array.FindIndex(sequence, x => x == applyingRules[iii].after);
+                        if (rules[iii].before != current) { continue; }
+
+                        int index = FindInSequence(sequence, rules[iii].after);
 
                         if (index < 0) { continue; }
 
@@ -128,5 +128,17 @@ internal class Day0524 : IDay
         }
 
         return middleSum.ToString();
+    }
+
+    private static int FindInSequence(int[] squence, int toFind)
+    {
+        for (int i = 0; i < squence.Length; ++i)
+        {
+            if (squence[i] != toFind) { continue; }
+
+            return i;
+        }
+
+        return -1;
     }
 }
