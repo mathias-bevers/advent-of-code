@@ -115,8 +115,10 @@ internal class Day0724 : IDay
                         result = long.Parse(concat);
                     }
 
-                    if (result == calibration.target)
+                    if (nextIndex == calibration.equation.Length - 1 &&
+                        result == calibration.target)
                     {
+
                         isValid = true;
                         break;
                     }
@@ -128,10 +130,10 @@ internal class Day0724 : IDay
             while (!isValid && queue.Count > 0);
 
             if (!isValid) { continue; }
-            
+
             validCalibrationSum += calibration.target;
         }
-
+        
         return validCalibrationSum.ToString();
     }
 
