@@ -36,7 +36,45 @@ internal class Day0724 : IDay
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        long validCalibrationSum = 0;
+
+        for (int i = 0; i < calibrations.Length; ++i)
+        {
+            Calibration calibration = calibrations[i];
+            bool isValid = false;
+
+            for (int ii = 0; ii < calibration.possibleConfigurations; ++ii)
+            {
+                long equationResult = calibration.equation[0];
+                for (int iii = 1; iii < calibration.equation.Length; ++iii)
+                {
+                    int lastBit = (ii >> iii - 1);
+                    bool isMultiplication = ((lastBit & 1) == 1);
+
+                    if (isMultiplication)
+                    {
+                        equationResult *= calibration.equation[iii];
+                    }
+                    else
+                    {
+                        equationResult += calibration.equation[iii];
+                    }
+
+                    if (equationResult > calibration.target) { break; }
+                }
+
+                if (equationResult != calibration.target) { continue; }
+
+                isValid = true;
+                break;
+            }
+
+            if (!isValid) { continue; }
+
+            validCalibrationSum += calibration.target;
+        }
+
+        return validCalibrationSum.ToString();
     }
 
     public string SolveStarTwo()
