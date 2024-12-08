@@ -8,7 +8,10 @@ internal class Day0824 : IDay
     public DateTime date { get; } = new(2024, 12, 08);
 
     private const char EMPTY = '.';
+
+
     private char[,] grid = new char[0, 0];
+    Dictionary<char, List<Vector2Int>> antennas = [];
 
     public void PopulateData(string raw)
     {
@@ -19,35 +22,27 @@ internal class Day0824 : IDay
         {
             for (int x = 0; x < grid.GetLength(0); ++x)
             {
-                grid[x, y] = rows[y][x];
+                char current = rows[y][x];
+
+                grid[x, y] = current;
+
+                if (current == EMPTY) { continue; }
+
+                if (!antennas.TryAdd(current, new List<Vector2Int>() { new(x, y) }))
+                {
+                    antennas[current].Add(new Vector2Int(x, y));
+                }
             }
         }
     }
 
     public string SolveStarOne()
     {
-        Dictionary<char, List<Vector2Int>> frequencies = [];
-
-        for (int y = 0; y < grid.GetLength(1); ++y)
-        {
-            for (int x = 0; x < grid.GetLength(0); ++x)
-            {
-                char current = grid[x, y];
-
-                if (current == EMPTY) { continue; }
-
-                if (!frequencies.TryAdd(current, new List<Vector2Int>() { new(x, y) }))
-                {
-                    frequencies[current].Add(new Vector2Int(x, y));
-                }
-            }
-        }
-
         HashSet<Vector2Int> antinodes = [];
 
-        for (int i = 0; i < frequencies.Count; ++i)
+        for (int i = 0; i < antennas.Count; ++i)
         {
-            List<Vector2Int> collection = frequencies.ElementAt(i).Value;
+            List<Vector2Int> collection = antennas.ElementAt(i).Value;
 
             for (int ii = 0; ii < collection.Count; ++ii)
             {
@@ -70,7 +65,32 @@ internal class Day0824 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        HashSet<Vector2Int> antinodes = [];
+
+        for (int i = 0; i < antennas.Count; ++i)
+        {
+            List<Vector2Int> collection = antennas.ElementAt(i).Value;
+
+            for (int ii = 0; ii < collection.Count; ++ii)
+            {
+                for (int iii = 0; iii < collection.Count; ++iii)
+                {
+                    if (iii == ii) continue;
+
+                    Vector2Int offset = (collection[iii] - collection[ii]) * -1;
+                    Vector2Int current = collection[ii];
+
+                    while (IsPointInGrid(current))
+                    {
+                        antinodes.Add(current);
+
+                        current += offset;
+                    }
+                }
+            }
+        }
+
+        return (antinodes.Count).ToString();
     }
 
     private bool IsPointInGrid(Vector2Int point)
