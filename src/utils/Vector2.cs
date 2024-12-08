@@ -76,4 +76,5 @@ public struct Vector2Int
         return x == other.x && y == other.y;
     }
 
+    public override readonly string ToString() => string.Concat('[', x, ", ", y, ']');
 }
