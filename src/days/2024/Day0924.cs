@@ -125,19 +125,20 @@ internal class Day0924 : IDay
 
                 (file.index, empty.index) = (empty.index, file.index);
 
-                if (file.size < empty.index)
+                if (file.size < empty.size)
                 {
                     int difference = empty.size - file.size;
                     empty.size = file.size;
                     fileBlocks.Add(new FileBlock(EMPTY_INT, file.index + file.size, difference));
+                    ++i;
                 }
-
 
                 break;
             }
         }
 
         fileBlocks.Sort((a, b) => a.index.CompareTo(b.index));
+
 
         List<int> fileSystem = [];
         for (int i = 0; i < fileBlocks.Count; ++i)
