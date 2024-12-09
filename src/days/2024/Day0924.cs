@@ -1,4 +1,5 @@
 
+using System.Data.Common;
 using System.Text;
 
 namespace advent_of_code.days;
@@ -67,7 +68,7 @@ internal class Day0924 : IDay
 
         for (int i = 0; i < fileBlocks.Count; ++i)
         {
-            if (fileBlocks[i] == -1) { break; }
+            if (fileBlocks[i] == EMPTY_INT) { break; }
 
             fileSystemCheckSum += i * fileBlocks[i];
         }
@@ -102,7 +103,7 @@ internal class Day0924 : IDay
         int index = 0;
         for (int i = 0; i < denseDiskMap.Length; ++i)
         {
-            int id = (i % 2 == 0) ? i / 2 : -1;
+            int id = (i % 2 == 0) ? i / 2 : EMPTY_INT;
             int size = (int)char.GetNumericValue(denseDiskMap[i]);
             index += size;
 
@@ -111,25 +112,48 @@ internal class Day0924 : IDay
 
         for (int i = fileBlocks.Count - 1; i >= 0; --i)
         {
-            FileBlock fileBlock = fileBlocks[i];
+            FileBlock file = fileBlocks[i];
 
-            if (fileBlock.id < 0) { continue; }
+            if (file.id < 0) { continue; }
 
             for (int ii = 0; ii < fileBlocks.Count; ++ii)
             {
-                FileBlock other = fileBlocks[ii];
-                if (other.id >= 0 || other.index > fileBlock.index) { continue; }
+                FileBlock empty = fileBlocks[ii];
+                if (empty.id >= 0 || empty.index > file.index) { continue; }
 
-                if (other.size < fileBlock.size) { continue; }
+                if (empty.size < file.size) { continue; }
 
-                (fileBlock.index, other.index) = (other.index, fileBlock.index);
+                (file.index, empty.index) = (empty.index, file.index);
+
+                if (file.size < empty.index)
+                {
+                    int difference = empty.size - file.size;
+                    empty.size = file.size;
+                    fileBlocks.Add(new FileBlock(EMPTY_INT, file.index + file.size, difference));
+                }
+
+
                 break;
             }
         }
 
-        utils.Logger.WriteToLogFile(string.Join("", fileBlocks));
+        fileBlocks.Sort((a, b) => a.index.CompareTo(b.index));
+
+        List<int> fileSystem = [];
+        for (int i = 0; i < fileBlocks.Count; ++i)
+        {
+            FileBlock f = fileBlocks[i];
+            fileSystem.AddRange(Enumerable.Repeat(f.id, f.size));
+        }
 
         long fileSystemCheckSum = 0;
+
+        for (int i = 0; i < fileSystem.Count; ++i)
+        {
+            if (fileSystem[i] == EMPTY_INT) { continue; }
+
+            fileSystemCheckSum += i * fileSystem[i];
+        }
 
         return fileSystemCheckSum.ToString();
     }
@@ -138,7 +162,7 @@ internal class Day0924 : IDay
     {
         public int id { get; } = id;
         public int index { get; set; } = index;
-        public int size { get; } = size;
+        public int size { get; set; } = size;
 
         public override string ToString()
         {
