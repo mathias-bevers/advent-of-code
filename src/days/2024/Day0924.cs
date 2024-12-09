@@ -1,7 +1,3 @@
-
-using System.Data.Common;
-using System.Text;
-
 namespace advent_of_code.days;
 
 internal class Day0924 : IDay
@@ -99,77 +95,89 @@ internal class Day0924 : IDay
 
     public string SolveStarTwo()
     {
-        List<FileBlock> fileBlocks = [];
-        int index = 0;
+        List<int> fileBlocks = [];
+
         for (int i = 0; i < denseDiskMap.Length; ++i)
         {
-            int id = (i % 2 == 0) ? i / 2 : EMPTY_INT;
-            int size = (int)char.GetNumericValue(denseDiskMap[i]);
-            index += size;
+            bool isBlockFile = i % 2 == 0;
 
-            fileBlocks.Add(new FileBlock(id, index, size));
-        }
+            int count = (int)char.GetNumericValue(denseDiskMap[i]);
 
-        for (int i = fileBlocks.Count - 1; i >= 0; --i)
-        {
-            FileBlock file = fileBlocks[i];
-
-            if (file.id < 0) { continue; }
-
-            for (int ii = 0; ii < fileBlocks.Count; ++ii)
+            if (isBlockFile)
             {
-                FileBlock empty = fileBlocks[ii];
-                if (empty.id >= 0 || empty.index > file.index) { continue; }
-
-                if (empty.size < file.size) { continue; }
-
-                (file.index, empty.index) = (empty.index, file.index);
-
-                if (file.size < empty.size)
-                {
-                    int difference = empty.size - file.size;
-                    empty.size = file.size;
-                    fileBlocks.Add(new FileBlock(EMPTY_INT, file.index + file.size, difference));
-                    ++i;
-                }
-
-                break;
+                int id = i / 2;
+                fileBlocks.AddRange(Enumerable.Repeat(id, count));
+            }
+            else
+            {
+                fileBlocks.AddRange(Enumerable.Repeat(EMPTY_INT, count));
             }
         }
 
-        fileBlocks.Sort((a, b) => a.index.CompareTo(b.index));
+        int lastOccurance = fileBlocks.Count - 1;
+        int idA = fileBlocks[lastOccurance];
 
-
-        List<int> fileSystem = [];
-        for (int i = 0; i < fileBlocks.Count; ++i)
+        for (int i = fileBlocks.Count - 1; i >= 0; --i)
         {
-            FileBlock f = fileBlocks[i];
-            fileSystem.AddRange(Enumerable.Repeat(f.id, f.size));
+            if (fileBlocks[i] == idA) { continue; }
+
+            if (idA != EMPTY_INT)
+            {
+                int sizeA = lastOccurance - i;
+
+                int firstOccurrance = 0;
+                int idB = fileBlocks[firstOccurrance];
+
+                for (int ii = 0; ii < fileBlocks.Count; ++ii)
+                {
+                    if (fileBlocks[ii] == idB) { continue; }
+
+                    if (ii >= i) { break; }
+
+                    if (idB == EMPTY_INT)
+                    {
+                        int sizeB = ii - firstOccurrance;
+
+                        if (sizeA <= sizeB)
+                        {
+                            for (int iii = 0; iii < sizeA; ++iii)
+                            {
+                                fileBlocks[firstOccurrance + iii] = idA;
+                                fileBlocks[lastOccurance - iii] = EMPTY_INT;
+                            }
+
+                            break;
+                        }
+
+                    }
+
+                    firstOccurrance = ii;
+                    idB = fileBlocks[ii];
+                }
+            }
+
+            lastOccurance = i;
+            idA = fileBlocks[i];
         }
+
+        string log = string.Empty;
 
         long fileSystemCheckSum = 0;
 
-        for (int i = 0; i < fileSystem.Count; ++i)
+        for (int i = 0; i < fileBlocks.Count; ++i)
         {
-            if (fileSystem[i] == EMPTY_INT) { continue; }
+            if (fileBlocks[i] == EMPTY_INT)
+            {
+                log += '.';
+                continue;
+            }
 
-            fileSystemCheckSum += i * fileSystem[i];
+            log += fileBlocks[i];
+            fileSystemCheckSum += i * fileBlocks[i];
         }
+
+        utils.Logger.WriteToLogFile(log);
 
         return fileSystemCheckSum.ToString();
-    }
-
-    private class FileBlock(int id, int index, int size)
-    {
-        public int id { get; } = id;
-        public int index { get; set; } = index;
-        public int size { get; set; } = size;
-
-        public override string ToString()
-        {
-            if (id < 0) { return new string('.', size); }
-
-            return new string((char)(id + 48), size);
-        }
     }
 }
