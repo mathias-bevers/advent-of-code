@@ -7,8 +7,7 @@ internal class Day0924 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 09);
 
-    private const char EMPTY_CHAR = '.';
-    private const long EMPTY_LONG = -1;
+    private const int EMPTY_INT = -1;
 
     private string denseDiskMap = string.Empty;
 
@@ -19,22 +18,22 @@ internal class Day0924 : IDay
 
     public string SolveStarOne()
     {
-        List<long> fileBlocks = new();
+        List<int> fileBlocks = [];
 
         for (int i = 0; i < denseDiskMap.Length; ++i)
         {
             bool isBlockFile = i % 2 == 0;
 
-            int count = (int)Char.GetNumericValue(denseDiskMap[i]);
+            int count = (int)char.GetNumericValue(denseDiskMap[i]);
 
             if (isBlockFile)
             {
-                long id = i / 2;
+                int id = i / 2;
                 fileBlocks.AddRange(Enumerable.Repeat(id, count));
             }
             else
             {
-                fileBlocks.AddRange(Enumerable.Repeat(EMPTY_LONG, count));
+                fileBlocks.AddRange(Enumerable.Repeat(EMPTY_INT, count));
             }
         }
 
@@ -45,7 +44,7 @@ internal class Day0924 : IDay
 
             for (int i = 0; i < fileBlocks.Count; ++i)
             {
-                if (fileBlocks[i] != EMPTY_LONG) { continue; }
+                if (fileBlocks[i] != EMPTY_INT) { continue; }
 
                 firstEmpty = i;
                 break;
@@ -53,16 +52,16 @@ internal class Day0924 : IDay
 
             for (int i = fileBlocks.Count - 1; i >= 0; --i)
             {
-                if (fileBlocks[i] == EMPTY_LONG) { continue; }
+                if (fileBlocks[i] == EMPTY_INT) { continue; }
 
                 lastDigit = i;
                 break;
             }
 
             fileBlocks[firstEmpty] = fileBlocks[lastDigit];
-            fileBlocks[lastDigit] = EMPTY_LONG;
+            fileBlocks[lastDigit] = EMPTY_INT;
         }
-        while (!IsCompacted(fileBlocks));
+        while (!IsCompacted());
 
         long fileSystemCheckSum = 0;
 
@@ -70,36 +69,82 @@ internal class Day0924 : IDay
         {
             if (fileBlocks[i] == -1) { break; }
 
-            long temp = i * fileBlocks[i];
-            fileSystemCheckSum += temp;
+            fileSystemCheckSum += i * fileBlocks[i];
         }
 
         return fileSystemCheckSum.ToString();
+
+        bool IsCompacted()
+        {
+            bool hasVisitedEmpty = false;
+
+            for (int i = 0; i < fileBlocks.Count; ++i)
+            {
+                if (!hasVisitedEmpty)
+                {
+                    hasVisitedEmpty = fileBlocks[i] == EMPTY_INT;
+                    continue;
+                }
+
+                if (fileBlocks[i] > 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
-    }
-
-    private static bool IsCompacted(List<long> input)
-    {
-        bool hasVisitedEmpty = false;
-
-        for (int i = 0; i < input.Count; ++i)
+        List<FileBlock> fileBlocks = [];
+        int index = 0;
+        for (int i = 0; i < denseDiskMap.Length; ++i)
         {
-            if (!hasVisitedEmpty)
-            {
-                hasVisitedEmpty = input[i] == EMPTY_LONG;
-                continue;
-            }
+            int id = (i % 2 == 0) ? i / 2 : -1;
+            int size = (int)char.GetNumericValue(denseDiskMap[i]);
+            index += size;
 
-            if (input[i] > 0)
+            fileBlocks.Add(new FileBlock(id, index, size));
+        }
+
+        for (int i = fileBlocks.Count - 1; i >= 0; --i)
+        {
+            FileBlock fileBlock = fileBlocks[i];
+
+            if (fileBlock.id < 0) { continue; }
+
+            for (int ii = 0; ii < fileBlocks.Count; ++ii)
             {
-                return false;
+                FileBlock other = fileBlocks[ii];
+                if (other.id >= 0 || other.index > fileBlock.index) { continue; }
+
+                if (other.size < fileBlock.size) { continue; }
+
+                (fileBlock.index, other.index) = (other.index, fileBlock.index);
+                break;
             }
         }
 
-        return true;
+        utils.Logger.WriteToLogFile(string.Join("", fileBlocks));
+
+        long fileSystemCheckSum = 0;
+
+        return fileSystemCheckSum.ToString();
+    }
+
+    private class FileBlock(int id, int index, int size)
+    {
+        public int id { get; } = id;
+        public int index { get; set; } = index;
+        public int size { get; } = size;
+
+        public override string ToString()
+        {
+            if (id < 0) { return new string('.', size); }
+
+            return new string((char)(id + 48), size);
+        }
     }
 }
