@@ -1,3 +1,6 @@
+using System.Numerics;
+using Microsoft.VisualBasic;
+
 namespace advent_of_code.days;
 
 internal class Day0924 : IDay
@@ -95,8 +98,7 @@ internal class Day0924 : IDay
 
     public string SolveStarTwo()
     {
-        List<int> fileBlocks = [];
-
+        List<int> tmp = [];
         for (int i = 0; i < denseDiskMap.Length; ++i)
         {
             bool isBlockFile = i % 2 == 0;
@@ -106,65 +108,49 @@ internal class Day0924 : IDay
             if (isBlockFile)
             {
                 int id = i / 2;
-                fileBlocks.AddRange(Enumerable.Repeat(id, count));
+                tmp.AddRange(Enumerable.Repeat(id, count));
             }
             else
             {
-                fileBlocks.AddRange(Enumerable.Repeat(EMPTY_INT, count));
+                tmp.AddRange(Enumerable.Repeat(EMPTY_INT, count));
             }
         }
 
-        int lastOccurance = fileBlocks.Count - 1;
-        int idA = fileBlocks[lastOccurance];
+        int[] fileBlocks = [.. tmp];
 
-        for (int i = fileBlocks.Count - 1; i >= 0; --i)
+        int lastOccurance = fileBlocks.Length - 1;
+        int currentID = fileBlocks[lastOccurance];
+
+        for (int i = fileBlocks.Length - 1; i >= 0; --i)
         {
-            if (fileBlocks[i] == idA) { continue; }
+            if (fileBlocks[i] == currentID) { continue; }
 
-            if (idA != EMPTY_INT)
+            if (currentID != EMPTY_INT)
             {
-                int sizeA = lastOccurance - i;
+                int size = lastOccurance - i;
 
-                int firstOccurrance = 0;
-                int idB = fileBlocks[firstOccurrance];
+                int emptyIndex = FindFirstEmptySpace(fileBlocks, i, size);
 
-                for (int ii = 0; ii < fileBlocks.Count; ++ii)
+                if (emptyIndex >= 0)
                 {
-                    if (fileBlocks[ii] == idB) { continue; }
-
-                    if (ii >= i) { break; }
-
-                    if (idB == EMPTY_INT)
+                    for (int ii = 0; ii < size; ++ii)
                     {
-                        int sizeB = ii - firstOccurrance;
-
-                        if (sizeA <= sizeB)
-                        {
-                            for (int iii = 0; iii < sizeA; ++iii)
-                            {
-                                fileBlocks[firstOccurrance + iii] = idA;
-                                fileBlocks[lastOccurance - iii] = EMPTY_INT;
-                            }
-
-                            break;
-                        }
-
+                        int t = emptyIndex + ii;
+                        fileBlocks[t] = currentID;
+                        fileBlocks[lastOccurance - ii] = EMPTY_INT;
                     }
-
-                    firstOccurrance = ii;
-                    idB = fileBlocks[ii];
                 }
             }
 
             lastOccurance = i;
-            idA = fileBlocks[i];
+            currentID = fileBlocks[i];
         }
 
         string log = string.Empty;
 
         long fileSystemCheckSum = 0;
 
-        for (int i = 0; i < fileBlocks.Count; ++i)
+        for (int i = 0; i < fileBlocks.Length; ++i)
         {
             if (fileBlocks[i] == EMPTY_INT)
             {
@@ -175,9 +161,24 @@ internal class Day0924 : IDay
             log += fileBlocks[i];
             fileSystemCheckSum += i * fileBlocks[i];
         }
-
-        utils.Logger.WriteToLogFile(log);
-
+        
         return fileSystemCheckSum.ToString();
+    }
+
+    private static int FindFirstEmptySpace(int[] source, int index, int size)
+    {
+        for (int i = 0; i < index; ++i)
+        {
+            if (source[i] != EMPTY_INT) { continue; }
+
+            for (int ii = 0; ii < size; ++ii)
+            {
+                if (source[i + ii] != EMPTY_INT) { break; }
+
+                if (ii == size - 1) { return i; }
+            }
+        }
+
+        return -1;
     }
 }
