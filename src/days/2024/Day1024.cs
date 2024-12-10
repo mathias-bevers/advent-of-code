@@ -28,7 +28,7 @@ internal class Day1024 : IDay
     {
         int scoreSum = 0;
         Queue<Vector2Int> pointQueue = new();
-        HashSet<Vector2Int> endPoints = new(); ;
+        HashSet<Vector2Int> endPoints = new();
 
         for (int y = 0; y < grid.GetLength(1); ++y)
         {
@@ -46,7 +46,7 @@ internal class Day1024 : IDay
                 while (pointQueue.Count > 0)
                 {
                     Vector2Int currentPoint = pointQueue.Dequeue();
-                    int currentHeight = grid[currentPoint.x, currentPoint.y];
+                    int nextHieght = grid[currentPoint.x, currentPoint.y] + 1;
                     Vector2Int[] neighbors = GetNeighbors(currentPoint);
 
                     for (int i = 0; i < neighbors.Length; ++i)
@@ -54,7 +54,7 @@ internal class Day1024 : IDay
                         Vector2Int neighbor = neighbors[i];
                         int neighborValue = grid[neighbor.x, neighbor.y];
 
-                        if (neighborValue != (currentHeight + 1)) { continue; }
+                        if (neighborValue != nextHieght) { continue; }
 
                         if (neighborValue != MAX_HEIGHT)
                         {
@@ -75,7 +75,56 @@ internal class Day1024 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        int scoreSum = 0;
+        Queue<List<Vector2Int>> pathQueue = new();
+        List<Vector2Int> path = new();
+
+        for (int y = 0; y < grid.GetLength(1); ++y)
+        {
+            for (int x = 0; x < grid.GetLength(0); ++x)
+            {
+                int startingHeight = grid[x, y];
+
+                if (startingHeight > 0) { continue; }
+
+                pathQueue.Clear();
+                path.Clear();
+
+                path.Add(new Vector2Int(x, y));
+                pathQueue.Enqueue(path);
+
+                while (pathQueue.Count > 0)
+                {
+                    List<Vector2Int> currentPath = pathQueue.Dequeue();
+                    Vector2Int last = currentPath[currentPath.Count - 1];
+
+                    if (grid[last.x, last.y] == MAX_HEIGHT)
+                    {
+                        ++scoreSum;
+                        continue;
+                    }
+
+                    Vector2Int[] neighbors = GetNeighbors(last);
+                    int nextValue = grid[last.x, last.y] + 1;
+
+                    for (int i = 0; i < neighbors.Length; ++i)
+                    {
+                        Vector2Int neighbor = neighbors[i];
+                        int neighborValue = grid[neighbor.x, neighbor.y];
+
+                        if (neighborValue != nextValue) { continue; }
+
+                        if (IsPointVisited(neighbor, currentPath)) { continue; }
+
+                        List<Vector2Int> newPath = new(currentPath);
+                        newPath.Add(neighbor);
+                        pathQueue.Enqueue(newPath);
+                    }
+                }
+            }
+        }
+
+        return scoreSum.ToString();
     }
 
     private Vector2Int[] GetNeighbors(Vector2Int point)
@@ -87,18 +136,27 @@ internal class Day1024 : IDay
         {
             dir.RotateDegrees(-90);
 
-            Vector2Int neighborPoint = point + dir;
+            Vector2Int neighbor = point + dir;
 
-            if (neighborPoint.x < 0 || neighborPoint.y < 0) { continue; }
+            if (neighbor.x < 0 || neighbor.y < 0) { continue; }
 
-            if (neighborPoint.x >= grid.GetLength(0) || neighborPoint.y >= grid.GetLength(1))
-            {
-                continue;
-            }
+            if (neighbor.x >= grid.GetLength(0) || neighbor.y >= grid.GetLength(1)) { continue; }
 
-            neighbors.Add(neighborPoint);
+            neighbors.Add(neighbor);
         }
 
         return neighbors.ToArray();
+    }
+
+    private bool IsPointVisited(Vector2Int target, List<Vector2Int> path)
+    {
+        for (int i = 0; i < path.Count; ++i)
+        {
+            if (target != path[i]) { continue; }
+
+            return true;
+        }
+
+        return false;
     }
 }
