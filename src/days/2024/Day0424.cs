@@ -10,16 +10,16 @@ internal class Day0424 : IDay
     private char[,] grid = new char[0, 0];
     private readonly Dictionary<int, char> searchingCharacters =
         new() { { 1, 'M' }, { 2, 'A' }, { 3, 'S' } };
-    private readonly Vector2Int[] directions = {
-        new Vector2Int(0,1),
-        new Vector2Int(1,1),
-        new Vector2Int(1,0),
-        new Vector2Int(1,-1),
-        new Vector2Int(0,-1),
-        new Vector2Int(-1,-1),
-        new Vector2Int(-1,0),
-        new Vector2Int(-1,1)
-    };
+    private readonly Vector2Int[] directions = [
+        new ( 0, 1),
+        new ( 1, 1),
+        new ( 1, 0),
+        new ( 1,-1),
+        new ( 0,-1),
+        new (-1,-1),
+        new (-1, 0),
+        new (-1, 1)
+    ];
 
     public void PopulateData(string raw)
     {

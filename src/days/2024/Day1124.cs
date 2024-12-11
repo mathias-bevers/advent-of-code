@@ -24,8 +24,6 @@ internal class Day1124 : IDay
 
     public string SolveStarTwo() => ComputeBlinks(BLINK_COUNT_STAR_TWO, stones).ToString();
 
-    // public string SolveStarTwo() => throw new NotImplementedException();
-
     private static long ComputeBlinks(int blinks, long[] source)
     {
         Dictionary<long, long> stones = [];

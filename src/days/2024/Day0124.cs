@@ -5,7 +5,7 @@ internal class Day0124 : IDay
 {
     public DateTime date { get; } = new DateTime(2024, 12, 01);
 
-    private int[][] data = new int[2][];
+    private readonly int[][] data = new int[2][];
 
     public void PopulateData(string raw)
     {
