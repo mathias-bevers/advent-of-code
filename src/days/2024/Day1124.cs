@@ -1,3 +1,4 @@
+using System.Collections;
 
 namespace advent_of_code.days;
 
@@ -5,58 +6,85 @@ internal class Day1124 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 11);
 
-    private const int BLINK_COUNT = 25;
+    private const int BLINK_COUNT_STAR_ONE = 25;
+    private const int BLINK_COUNT_STAR_TWO = 75;
 
-    private long[] initialStones = [];
+    private readonly CancellationTokenSource cts;
+
+    private long[] stones = [];
+
+    public Day1124()
+    {
+        cts = new CancellationTokenSource();
+    }
+
+    ~Day1124()
+    {
+        cts.Cancel();
+    }
 
     public void PopulateData(string raw)
     {
         string[] stonesRaw = raw.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        initialStones = new long[stonesRaw.Length];
+        stones = new long[stonesRaw.Length];
 
         for (long i = 0; i < stonesRaw.Length; ++i)
         {
-            initialStones[i] = long.Parse(stonesRaw[i]);
+            stones[i] = long.Parse(stonesRaw[i]);
         }
     }
 
-    public string SolveStarOne()
-    {
-        List<long> stones = [.. initialStones];
+    public string SolveStarOne() => ComputeBlinks(BLINK_COUNT_STAR_ONE, stones).ToString();
 
-        for (int i = 0; i < BLINK_COUNT; ++i)
+    public string SolveStarTwo() => ComputeBlinks(BLINK_COUNT_STAR_TWO, stones).ToString();
+
+    // public string SolveStarTwo() => throw new NotImplementedException();
+
+    private int ComputeBlinks(int blinks, long[] source)
+    {
+        ArrayList stones = [.. source];
+        List<Task> tasks = [];
+
+        for (int i = 0; i < blinks; ++i)
         {
-            for (int ii = stones.Count - 1; ii >= 0; --ii)
+            for (int ii = stones.Count - 1; ii >= 0; ii--)
             {
-                long stone = stones[ii];
-                if (stone == 0)
-                {
-                    stones[ii] = 1;
-                    continue;
-                }
-
-                string stoneString = stone.ToString();
-                if(stoneString.Length % 2 == 0) 
-                {
-                    int middle = stoneString.Length / 2;
-                    stones[ii] = long.Parse(stoneString.Substring(0, middle));
-                    stones.Insert(ii + 1, long.Parse(stoneString.Substring(middle)));
-                    continue;
-                }
-
-                stone *= 2024;
-
-                if(stone < 0) { throw new OverflowException("long is to small"); }
-
-                stones[ii] = stone;
+                int index = ii;
+                ArrayList current = ArrayList.Synchronized(stones);
+                Task task = Task.Run(async () => await ProcessStone(index, current), cts.Token);
+                tasks.Add(task);
             }
+
+            Task.WaitAll([.. tasks]);
+            tasks.Clear();
         }
 
-        return stones.Count.ToString();
+        return stones.Count;
     }
 
-    public string SolveStarTwo()
+    private static async Task ProcessStone(int index, ArrayList stones)
     {
-        throw new NotImplementedException();
+        await Task.Yield();
+
+        long stone = Convert.ToInt64(stones[index]);
+        string stoneStr = stone.ToString();
+
+        if (stone == 0)
+        {
+            stones[index] = 1L;
+        }
+        else if (stoneStr.Length % 2 == 0)
+        {
+
+            int middle = stoneStr.Length / 2;
+            stones[index] = long.Parse(stoneStr.Substring(0, middle));
+            stones.Insert(index + 1, long.Parse(stoneStr.Substring(middle)));
+
+        }
+        else
+        {
+            stone *= 2024;
+            stones[index] = stone;
+        }
     }
 }
