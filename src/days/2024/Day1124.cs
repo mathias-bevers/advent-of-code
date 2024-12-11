@@ -1,4 +1,4 @@
-using System.Collections;
+using Stone = (long value, int depth);
 
 namespace advent_of_code.days;
 
@@ -40,51 +40,44 @@ internal class Day1124 : IDay
 
     // public string SolveStarTwo() => throw new NotImplementedException();
 
-    private int ComputeBlinks(int blinks, long[] source)
+    private long ComputeBlinks(int blinks, long[] source)
     {
-        ArrayList stones = [.. source];
-        List<Task> tasks = [];
-
-        for (int i = 0; i < blinks; ++i)
+        Stack<Stone> stack = new();
+        for (int i = 0; i < source.Length; ++i)
         {
-            for (int ii = stones.Count - 1; ii >= 0; ii--)
+            stack.Push((source[i], blinks));
+        }
+
+        long count = 0;
+
+        while (stack.Count > 0)
+        {
+            Stone stone = stack.Pop();
+
+            if (stone.depth == 0)
             {
-                int index = ii;
-                ArrayList current = ArrayList.Synchronized(stones);
-                Task task = Task.Run(async () => await ProcessStone(index, current), cts.Token);
-                tasks.Add(task);
+                ++count;
+                continue;
             }
 
-            Task.WaitAll([.. tasks]);
-            tasks.Clear();
+            if (stone.value == 0)
+            {
+                stack.Push((1, stone.depth - 1));
+                continue;
+            }
+
+            string stoneStr = stone.value.ToString();
+            if (stoneStr.Length % 2 == 0)
+            {
+                int middle = stoneStr.Length / 2;
+                stack.Push((long.Parse(stoneStr[..middle]), stone.depth - 1));
+                stack.Push((long.Parse(stoneStr[middle..]), stone.depth - 1));
+                continue;
+            }
+
+            stack.Push((stone.value * 2024, stone.depth - 1));
         }
 
-        return stones.Count;
-    }
-
-    private static async Task ProcessStone(int index, ArrayList stones)
-    {
-        await Task.Yield();
-
-        long stone = Convert.ToInt64(stones[index]);
-        string stoneStr = stone.ToString();
-
-        if (stone == 0)
-        {
-            stones[index] = 1L;
-        }
-        else if (stoneStr.Length % 2 == 0)
-        {
-
-            int middle = stoneStr.Length / 2;
-            stones[index] = long.Parse(stoneStr.Substring(0, middle));
-            stones.Insert(index + 1, long.Parse(stoneStr.Substring(middle)));
-
-        }
-        else
-        {
-            stone *= 2024;
-            stones[index] = stone;
-        }
+        return count;
     }
 }
