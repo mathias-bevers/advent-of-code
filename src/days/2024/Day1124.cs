@@ -1,5 +1,3 @@
-using Stone = (long value, int depth);
-
 namespace advent_of_code.days;
 
 internal class Day1124 : IDay
@@ -9,19 +7,7 @@ internal class Day1124 : IDay
     private const int BLINK_COUNT_STAR_ONE = 25;
     private const int BLINK_COUNT_STAR_TWO = 75;
 
-    private readonly CancellationTokenSource cts;
-
     private long[] stones = [];
-
-    public Day1124()
-    {
-        cts = new CancellationTokenSource();
-    }
-
-    ~Day1124()
-    {
-        cts.Cancel();
-    }
 
     public void PopulateData(string raw)
     {
@@ -40,44 +26,52 @@ internal class Day1124 : IDay
 
     // public string SolveStarTwo() => throw new NotImplementedException();
 
-    private long ComputeBlinks(int blinks, long[] source)
+    private static long ComputeBlinks(int blinks, long[] source)
     {
-        Stack<Stone> stack = new();
+        Dictionary<long, long> stones = [];
+
         for (int i = 0; i < source.Length; ++i)
         {
-            stack.Push((source[i], blinks));
+            stones.Add(source[i], 1L);
         }
 
-        long count = 0;
-
-        while (stack.Count > 0)
+        for (int i = 0; i < blinks; ++i)
         {
-            Stone stone = stack.Pop();
-
-            if (stone.depth == 0)
+            Dictionary<long, long> newDictionary = [];
+            for (int ii = 0; ii < stones.Count; ++ii)
             {
-                ++count;
-                continue;
+                KeyValuePair<long, long> stone = stones.ElementAt(ii);
+
+                long[] processedStones = EvaluateStone(stone.Key);
+                for (int iii = 0; iii < processedStones.Length; ++iii)
+                {
+                    long processedStone = processedStones[iii];
+                    if (!newDictionary.TryAdd(processedStone, stone.Value))
+                    {
+                        newDictionary[processedStone] += stone.Value;
+                    }
+                }
             }
 
-            if (stone.value == 0)
-            {
-                stack.Push((1, stone.depth - 1));
-                continue;
-            }
-
-            string stoneStr = stone.value.ToString();
-            if (stoneStr.Length % 2 == 0)
-            {
-                int middle = stoneStr.Length / 2;
-                stack.Push((long.Parse(stoneStr[..middle]), stone.depth - 1));
-                stack.Push((long.Parse(stoneStr[middle..]), stone.depth - 1));
-                continue;
-            }
-
-            stack.Push((stone.value * 2024, stone.depth - 1));
+            stones = newDictionary;
         }
 
-        return count;
+        return stones.Values.Sum();
+    }
+
+    private static long[] EvaluateStone(long stone)
+    {
+        if (stone == 0) { return [1]; }
+
+        string stoneStr = stone.ToString();
+        if (stoneStr.Length % 2 == 0)
+        {
+            int middle = stoneStr.Length / 2;
+            long a = long.Parse(stoneStr[..middle]);
+            long b = long.Parse(stoneStr[middle..]);
+            return [a, b];
+        }
+
+        return [stone * 2024];
     }
 }
