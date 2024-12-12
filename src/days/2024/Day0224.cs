@@ -7,7 +7,7 @@ internal class Day0224 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 02);
 
-    private int[][] data = new int[0][];
+    private int[][] data = [];
 
     public void PopulateData(string raw)
     {
@@ -87,7 +87,7 @@ internal class Day0224 : IDay
                     }
                 }
 
-                if(!isSave)
+                if (!isSave)
                 {
                     continue;
                 }
@@ -100,7 +100,7 @@ internal class Day0224 : IDay
         return saveLevels.ToString();
     }
 
-    private bool IsSafeDifference(int left, int right, ref bool? isIncline)
+    private static bool IsSafeDifference(int left, int right, ref bool? isIncline)
     {
         int difference = right - left;
         int absoluteDifference = Math.Abs(difference);

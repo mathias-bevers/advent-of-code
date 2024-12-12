@@ -1,20 +1,20 @@
-namespace advent_of_code.utils;
+namespace advent_of_code.days;
 
 public class Day0120 : IDay
 {
-    public DateTime date { get; } = new (2020, 12, 01);
-	
+    public DateTime date { get; } = new(2020, 12, 01);
+
     private int[] data = [];
 
     public void PopulateData(string raw)
     {
         string[] lines = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
-		data = new int[lines.Length];
+        data = new int[lines.Length];
 
-		for(int i = 0; i < lines.Length; ++i)
-		{
-			data[i] = int.Parse(lines[i]);
-		}
+        for (int i = 0; i < lines.Length; ++i)
+        {
+            data[i] = int.Parse(lines[i]);
+        }
     }
 
     public string SolveStarOne()

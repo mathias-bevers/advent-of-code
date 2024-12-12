@@ -1,10 +1,10 @@
-﻿namespace advent_of_code;
+﻿namespace advent_of_code.days;
 
 public class Day0422 : IDay
 {
     public DateTime date { get; } = new(2022, 12, 04);
     
-    private List<(ElfAssignment, ElfAssignment)> elfPairs = [];
+    private List<(ElfAssignment, ElfAssignment)> elfPairs = []; 
 
     public void PopulateData(string raw)
     {
