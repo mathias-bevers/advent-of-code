@@ -6,6 +6,8 @@ internal class Day1324 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 13);
 
+    private const int MAX_BUTTON_PRESSES = 100;
+
     private Game[] games = [];
 
     public void PopulateData(string raw)
@@ -32,13 +34,24 @@ internal class Day1324 : IDay
 
             games[i] = new Game(buttonA, buttonB, target);
         }
-
-        Logger.Info('\n' + string.Join('\n', games));
     }
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        int totalNeededTokens = 0;
+
+        for (int i = 0; i < games.Length; ++i)
+        {
+            Game game = games[i];
+            
+            int neededTokens = game.CalculateLowestPrizeCost(MAX_BUTTON_PRESSES);
+
+            if (neededTokens < 0) { continue; }
+
+            totalNeededTokens += neededTokens;
+        }
+
+        return totalNeededTokens.ToString();
     }
 
     public string SolveStarTwo()
@@ -46,11 +59,31 @@ internal class Day1324 : IDay
         throw new NotImplementedException();
     }
 
-    private struct Game(Vector2Int a, Vector2Int b, Vector2Int t)
+    private record Game(Vector2Int a, Vector2Int b, Vector2Int t)
     {
+        private const int COST_A = 3;
+        private const int COST_B = 1;
+
         public Vector2Int buttonA { get; } = a;
         public Vector2Int buttonB { get; } = b;
         public Vector2Int target { get; } = t;
+
+        public int CalculateLowestPrizeCost(int maxButtonPresses)
+        {
+            for (int a = 0; a < maxButtonPresses; ++a)
+            {
+                for (int b = 0; b < maxButtonPresses; ++b)
+                {
+                    Vector2Int attempt = buttonA * a + buttonB * b;
+
+                    if (attempt != target) { continue; }
+
+                    return a * COST_A + b * COST_B;
+                }
+            }
+
+            return -1;
+        }
 
         public override string ToString() => string.Concat(buttonA, ", ", buttonB, ", ", target);
     }
