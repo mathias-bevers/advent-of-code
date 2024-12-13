@@ -1,0 +1,29 @@
+{
+    "Create IDay class": {
+        "prefix": "iday",
+        "body": [
+            "namespace advent_of_code.days;",
+            "",
+            "internal class ${TM_FILENAME_BASE} : IDay",
+            "{",
+            "    public DateTime date { get; } = new($0, 12, $1);",
+            "",
+            "    public void PopulateData(string raw)",
+            "    {",
+            "        throw new NotImplementedException();",
+            "    }",
+            "",
+            "    public string SolveStarOne()",
+            "    {",
+            "        throw new NotImplementedException();",
+            "    }",
+            "",
+            "    public string SolveStarTwo()",
+            "    {",
+            "        throw new NotImplementedException();",
+            "    }",
+            "}"
+        ],
+        "description": "Create a class which inherits from IDay"
+    }
+}
