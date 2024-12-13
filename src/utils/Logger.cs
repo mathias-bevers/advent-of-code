@@ -53,7 +53,7 @@ public static class Logger
         // padding is with the assumption that the result is a max 27 chars long.
         var temp = string.IsNullOrEmpty(record.starOne.result) ? "null" : record.starOne.result;
         BUILDER.Append(temp.PadRight(STAR_PADDING));
-        BUILDER.Append($"completed in {record.starOne.completionTime.ToString().PadLeft(3)}ms");
+        BUILDER.Append($"completed in {record.starOne.completionTime.ToString().PadLeft(5)}ms");
 
         BUILDER.Append(YELLOW);
         BUILDER.Append(" [\u2605 2] ");
@@ -61,7 +61,7 @@ public static class Logger
         // padding is with the assumption that the result is a max 27 chars long.
         temp = string.IsNullOrEmpty(record.starTwo.result) ? "null" : record.starTwo.result;
         BUILDER.Append(temp.PadRight(STAR_PADDING));
-        BUILDER.Append($"completed in {record.starTwo.completionTime.ToString().PadLeft(3)}ms");
+        BUILDER.Append($"completed in {record.starTwo.completionTime.ToString().PadLeft(5)}ms");
 
 
         Console.WriteLine(BUILDER.ToString());
