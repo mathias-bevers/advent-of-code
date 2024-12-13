@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -6,6 +7,7 @@ internal class Day1324 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 13);
 
+    private const int BUTTON_A_COST = 3;
     private const int MAX_BUTTON_PRESSES = 100;
 
     private Game[] games = [];
@@ -21,16 +23,16 @@ internal class Day1324 : IDay
                                                StringSplitOptions.RemoveEmptyEntries);
 
             string[] stringA = lines[0].Replace("Button A: ", string.Empty).Split(", ");
-            Vector2Int buttonA = new(int.Parse(stringA[0].Replace("X", string.Empty)),
-                                     int.Parse(stringA[1].Replace("Y", string.Empty)));
+            Vector2Long buttonA = new(long.Parse(stringA[0].Replace("X", string.Empty)),
+                                     long.Parse(stringA[1].Replace("Y", string.Empty)));
 
             string[] stringB = lines[1].Replace("Button B: ", string.Empty).Split(", ");
-            Vector2Int buttonB = new(int.Parse(stringB[0].Replace("X", string.Empty)),
-                                     int.Parse(stringB[1].Replace("Y", string.Empty)));
+            Vector2Long buttonB = new(long.Parse(stringB[0].Replace("X", string.Empty)),
+                                     long.Parse(stringB[1].Replace("Y", string.Empty)));
 
             string[] stringT = lines[2].Replace("Prize: ", string.Empty).Split(", ");
-            Vector2Int target = new(int.Parse(stringT[0].Replace("X=", string.Empty)),
-                                    int.Parse(stringT[1].Replace("Y=", string.Empty)));
+            Vector2Long target = new(long.Parse(stringT[0].Replace("X=", string.Empty)),
+                                    long.Parse(stringT[1].Replace("Y=", string.Empty)));
 
             games[i] = new Game(buttonA, buttonB, target);
         }
@@ -38,13 +40,13 @@ internal class Day1324 : IDay
 
     public string SolveStarOne()
     {
-        int totalNeededTokens = 0;
+        long totalNeededTokens = 0;
 
         for (int i = 0; i < games.Length; ++i)
         {
             Game game = games[i];
-            
-            int neededTokens = game.CalculateLowestPrizeCost(MAX_BUTTON_PRESSES);
+
+            long neededTokens = GetTargetCost(1, game);
 
             if (neededTokens < 0) { continue; }
 
@@ -56,35 +58,46 @@ internal class Day1324 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
-    }
+        long totalNeededTokens = 0;
 
-    private record Game(Vector2Int a, Vector2Int b, Vector2Int t)
-    {
-        private const int COST_A = 3;
-        private const int COST_B = 1;
-
-        public Vector2Int buttonA { get; } = a;
-        public Vector2Int buttonB { get; } = b;
-        public Vector2Int target { get; } = t;
-
-        public int CalculateLowestPrizeCost(int maxButtonPresses)
+        for (int i = 0; i < games.Length; ++i)
         {
-            for (int a = 0; a < maxButtonPresses; ++a)
-            {
-                for (int b = 0; b < maxButtonPresses; ++b)
-                {
-                    Vector2Int attempt = buttonA * a + buttonB * b;
+            Game game = games[i];
 
-                    if (attempt != target) { continue; }
+            long neededTokens = GetTargetCost(2, game);
 
-                    return a * COST_A + b * COST_B;
-                }
-            }
+            if (neededTokens < 0) { continue; }
 
-            return -1;
+            totalNeededTokens += neededTokens;
         }
 
-        public override string ToString() => string.Concat(buttonA, ", ", buttonB, ", ", target);
+        return totalNeededTokens.ToString();
+    }
+
+    private long GetTargetCost(byte part, Game game)
+    {
+        Vector2Long target = part == 2 ? game.targetTwo : game.targetOne;
+
+        long i = target.Determinant(game.buttonB) / game.buttonA.Determinant(game.buttonB);
+        long j = game.buttonA.Determinant(target) / game.buttonA.Determinant(game.buttonB);
+
+        if (i < 0 || j < 0) { return -1; }
+
+        Vector2Long result = game.buttonA * i + game.buttonB * j;
+
+        if (result != target) { return -1; }
+
+        return i * BUTTON_A_COST + j;
+    }
+
+    private record Game(Vector2Long a, Vector2Long b, Vector2Long t)
+    {
+        public Vector2Long buttonA { get; } = a;
+        public Vector2Long buttonB { get; } = b;
+        public Vector2Long targetOne { get; } = t;
+        public Vector2Long targetTwo { get; } = t + new Vector2Long(10_000_000_000_000);
+
+        public override string ToString() =>
+            string.Concat(buttonA, ", ", buttonB, ", ", targetOne);
     }
 }
