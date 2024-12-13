@@ -20,6 +20,9 @@ public struct Vector2
 
 public struct Vector2Int
 {
+    public static readonly Vector2Int negativeInfinity = new (int.MinValue);
+    public static readonly Vector2Int positiveInfinity = new (int.MaxValue);
+
     public int x { get; set; }
     public int y { get; set; }
 
