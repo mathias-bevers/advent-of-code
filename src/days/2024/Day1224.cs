@@ -1,4 +1,6 @@
 
+using System.ComponentModel.Design;
+using System.Data;
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -10,6 +12,19 @@ internal class Day1224 : IDay
     private int width = 0;
     private int height = 0;
     private Plot[,] grid = new Plot[0, 0];
+    private Region[] regions = [];
+
+    private readonly Vector2Int[] directions = [
+        new ( 0, 1),
+        new ( 1, 1),
+        new ( 1, 0),
+        new ( 1,-1),
+        new ( 0,-1),
+        new (-1,-1),
+        new (-1, 0),
+        new (-1, 1)
+    ];
+
 
     public void PopulateData(string raw)
     {
@@ -25,12 +40,8 @@ internal class Day1224 : IDay
                 grid[x, y] = new Plot(rows[y][x], new Vector2Int(x, y), null);
             }
         }
-    }
 
-    public string SolveStarOne()
-    {
-        List<Region> regions = [];
-
+        List<Region> tmp = [];
         for (int y = 0; y < height; ++y)
         {
             for (int x = 0; x < width; ++x)
@@ -39,17 +50,22 @@ internal class Day1224 : IDay
 
                 if (plot.parent != null) { continue; }
 
-                regions.Add(GenerateRegion(plot));
+                tmp.Add(GenerateRegion(plot));
             }
         }
 
+        regions = [.. tmp];
+    }
+
+    public string SolveStarOne()
+    {
         int sum = 0;
-        for (int i = 0; i < regions.Count; ++i)
+        for (int i = 0; i < regions.Length; ++i)
         {
             int area = regions[i].plots.Count;
             int perimeter = regions[i].perimeter;
-            int cost = area * perimeter;
-            sum += cost;
+            int price = area * perimeter;
+            sum += price;
         }
 
         return sum.ToString();
@@ -57,7 +73,41 @@ internal class Day1224 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        int sum = 0;
+
+        for (int i = 0; i < regions.Length; ++i)
+        {
+            Region region = regions[i];
+            int area = region.plots.Count;
+            int sides = 0;
+
+            foreach (Plot plot in region.plots)
+            {
+                bool north = region.ContainsPoint(plot.location + directions[0]);
+                bool northEast = region.ContainsPoint(plot.location + directions[1]);
+                bool east = region.ContainsPoint(plot.location + directions[2]);
+                bool southEast = region.ContainsPoint(plot.location + directions[3]);
+                bool south = region.ContainsPoint(plot.location + directions[4]);
+                bool southWest = region.ContainsPoint(plot.location + directions[5]);
+                bool west = region.ContainsPoint(plot.location + directions[6]);
+                bool northWest = region.ContainsPoint(plot.location + directions[7]);
+
+                if (!north && !east) { ++sides; }
+                if (!north && !west) { ++sides; }
+                if (!south && !east) { ++sides; }
+                if (!south && !west) { ++sides; }
+
+                if (north && east && !northEast) { ++sides; }
+                if (north && west && !northWest) { ++sides; }
+                if (south && east && !southEast) { ++sides; }
+                if (south && west && !southWest) { ++sides; }
+            }
+
+            int price = area * sides;
+            sum += price;
+        }
+
+        return sum.ToString();
     }
 
     private Region GenerateRegion(Plot initialPlot)
@@ -121,7 +171,19 @@ internal class Day1224 : IDay
             plot.parent = this;
             perimeter += plot.perimeter;
         }
-        
+
+        public bool ContainsPoint(Vector2Int point)
+        {
+            foreach (Plot plot in plots)
+            {
+                if (plot.location != point) { continue; }
+
+                return true;
+            }
+
+            return false;
+        }
+
         public override string ToString() =>
             string.Concat(identifier, ": ", string.Join(',', plots));
     }
