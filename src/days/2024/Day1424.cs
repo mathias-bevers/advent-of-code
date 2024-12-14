@@ -1,4 +1,4 @@
-using System.Numerics;
+using System.Drawing;
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -11,9 +11,7 @@ internal class Day1424 : IDay
     private static readonly Vector2Int exampleSize = new Vector2Int(11, 7);
     private static readonly Vector2Int puzzleSize = new Vector2Int(101, 103);
 
-
     private Robot[] robots = [];
-    private int[,] grid = new int[0, 0];
     private Vector2Int gridSize = new Vector2Int();
 
     public void PopulateData(string raw)
@@ -36,11 +34,13 @@ internal class Day1424 : IDay
         }
 
         gridSize = robots.Length <= 12 ? exampleSize : puzzleSize;
-        grid = new int[gridSize.x, gridSize.y];
     }
 
     public string SolveStarOne()
     {
+        int[,] grid = new int[0, 0];
+        grid = new int[gridSize.x, gridSize.y];
+
         for (int i = 0; i < robots.Length; ++i)
         {
             Robot robot = robots[i];
@@ -81,13 +81,55 @@ internal class Day1424 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        //TODO: see if this is required
+        for (int i = 0; i < robots.Length; ++i) { robots[i].ResetPosition(); }
+
+        System.Text.StringBuilder sb = new();
+        string outputFolderPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "aoc-mbevers", "day-14-24");
+        Directory.CreateDirectory(outputFolderPath);
+
+
+        int maxValue = 10_000;
+        for (int i = 0; i < maxValue; ++i)
+        {
+            int[,] grid = new int[gridSize.x, gridSize.y];
+
+            for (int ii = 0; ii < robots.Length; ++ii)
+            {
+                Robot robot = robots[ii];
+                robot.Move(gridSize);
+                grid[robot.position.x, robot.position.y] = 1;
+            }
+
+            sb.AppendLine("P1");
+            sb.Append($"{gridSize.x} {gridSize.y}");
+
+            for (int y = 0; y < gridSize.y; ++y)
+            {
+                sb.AppendLine();
+                for (int x = 0; x < gridSize.x; ++x)
+                {
+                    sb.Append(grid[x, y]);
+                }
+            }
+
+            File.WriteAllText(Path.Combine(outputFolderPath, $"iteration{i:0000}.pbm"),
+                sb.ToString());
+            sb.Clear();
+        }
+
+        Logger.Info("written images to: " + outputFolderPath);
+        return "see output folder!";
     }
 
     private class Robot(Vector2Int startPosition, Vector2Int velocity)
     {
         public Vector2Int position { get; set; } = startPosition;
         public Vector2Int velocity { get; } = velocity;
+
+        private Vector2Int startPosition = startPosition;
 
         public void Move(Vector2Int bounds)
         {
@@ -101,6 +143,8 @@ internal class Day1424 : IDay
 
             position = newPos;
         }
+
+        public void ResetPosition() => position = startPosition;
 
         public override string ToString() => string.Concat(position, ", ", velocity);
     }
