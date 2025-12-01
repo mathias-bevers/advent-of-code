@@ -28,7 +28,7 @@ internal static class DataFetcher
             return await response.Content.ReadAsStringAsync();
 
         }
-        catch(HttpRequestException e)
+        catch (HttpRequestException e)
         {
             Logger.Error(e.Message);
             return string.Empty;
@@ -38,7 +38,7 @@ internal static class DataFetcher
     internal static string ReadExample(this IDay day)
     {
         string fileName = $"day-{day.date.Day:D2}.example";
-        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "examples", 
+        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "examples",
             day.date.Year.ToString(), fileName);
 
         if (!File.Exists(filePath))
@@ -66,9 +66,15 @@ internal static class DataFetcher
             return;
         }
 
-        sessionID = File.ReadAllLines(filePath)[0];
+        string[] fileContents = File.ReadAllLines(filePath);
 
-
+        if (fileContents == null || fileContents.Length == 0)
+        {
+            throw new FileLoadException("the aoc.cookies file is empty!");
+        }
+      
+        sessionID = fileContents[0];
+        
         // Setup the http client.
         handler = new HttpClientHandler() { CookieContainer = new CookieContainer() };
         handler.CookieContainer.Add(new("https://www.adventofcode.com"),
