@@ -53,6 +53,35 @@ internal class Day0125 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        int dial = 50;
+        int zeroPass = 0;
+
+        for (int i = 0; i < rotations.Length; ++i)
+        {
+            // set a bool if the dial is at zero to prevent double counting.
+            bool atZero = (dial == 0);
+
+            // use only the 'left overs' for the dial calculations
+            dial += (rotations[i] % DAIL_MAX);
+            // add full rotations to the zero pass
+            zeroPass += Math.Abs(rotations[i] / DAIL_MAX);
+
+            if (dial < 0)
+            {
+                dial += DAIL_MAX;
+                zeroPass += atZero ? 0 : 1;
+            }
+            else if (dial >= DAIL_MAX)
+            {
+                dial -= DAIL_MAX;
+                zeroPass += atZero ? 0 : 1;
+            }
+            else if (dial == 0)
+            {
+                ++zeroPass;
+            }
+        }
+
+        return zeroPass.ToString();
     }
 }
