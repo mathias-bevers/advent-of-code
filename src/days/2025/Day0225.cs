@@ -1,5 +1,6 @@
 namespace advent_of_code.days;
 
+using System.Text.RegularExpressions;
 using advent_of_code.utils;
 using Range = (long min, long max);
 
@@ -57,6 +58,34 @@ internal class Day0225 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        long sumInvalidIDs = 0;
+
+        for (int i = 0; i < ranges.Length; ++i)
+        {
+            for (long ii = ranges[i].min; ii <= ranges[i].max; ii++)
+            {
+                int digidCount = (int)Math.Floor(Math.Log10(ii) + 1);
+                string id = ii.ToString();
+
+                // divide by two since we only care about the first half.
+                for (int iii = 1; iii <= digidCount / 2; iii++)
+                {
+                    // get the substr from 0 to iii count and count the occurances of the substr.
+                    string part = id[..iii];
+                    int occurenceCount = Regex.Count(id, part);
+
+                    // check if the product of the part size and occurance is enough for all digids.
+                    if (occurenceCount * iii != digidCount)
+                    {
+                        continue;
+                    }
+
+                    sumInvalidIDs += ii;
+                    break;
+                }
+            }
+        }
+
+        return sumInvalidIDs.ToString();
     }
 }
