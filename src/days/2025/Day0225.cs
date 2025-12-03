@@ -1,13 +1,11 @@
-namespace advent_of_code.days;
-
-using System.Text.RegularExpressions;
-using advent_of_code.utils;
 using Range = (long min, long max);
+
+namespace advent_of_code.days;
 
 internal class Day0225 : IDay
 {
     public DateTime date { get; } = new(2025, 12, 02);
-    private Range[] ranges = Array.Empty<Range>();
+    private Range[] ranges = [];
 
     public void PopulateData(string raw)
     {
@@ -50,7 +48,6 @@ internal class Day0225 : IDay
 
                 sumInvalidIDs += ii;
             }
-
         }
 
         return sumInvalidIDs.ToString();
@@ -70,9 +67,14 @@ internal class Day0225 : IDay
                 // divide by two since we only care about the first half.
                 for (int iii = 1; iii <= digidCount / 2; iii++)
                 {
+                    if (digidCount % iii != 0)
+                    {
+                        continue;
+                    }
+
                     // get the substr from 0 to iii count and count the occurances of the substr.
                     string part = id[..iii];
-                    int occurenceCount = Regex.Count(id, part);
+                    int occurenceCount = id.AsSpan().Count(part); // way faster then regex.
 
                     // check if the product of the part size and occurance is enough for all digids.
                     if (occurenceCount * iii != digidCount)

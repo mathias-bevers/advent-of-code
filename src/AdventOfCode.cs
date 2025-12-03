@@ -2,6 +2,7 @@ using advent_of_code.utils;
 using System.Diagnostics;
 using System.Reflection;
 using CommandLine;
+using System.Threading.Tasks;
 
 namespace advent_of_code;
 
@@ -48,8 +49,8 @@ public class AdventOfCode
 
             try
             {
-                string data = options.example ? day.ReadExample()
-                    : Task.Run(day.ReadDataAsync).Result;
+                Task<string> task = day.GetInput(options.example);
+                string data = task.GetAwaiter().GetResult();
 
                 if(string.IsNullOrEmpty(data))
                 {
