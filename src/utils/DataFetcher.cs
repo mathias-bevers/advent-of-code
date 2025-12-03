@@ -11,44 +11,50 @@ internal static class DataFetcher
 
     private static string sessionID = string.Empty;
 
-
-    internal static async Task<string> ReadDataAsync(this IDay day)
+    internal static async Task<string> GetInput(this IDay day, bool isExampleMode)
     {
-        if (client is null || handler is null)
+        string fileName = $"day-{day.date.Day:D2}" + (isExampleMode ? ".example" : ".input");
+        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "input",
+            day.date.Year.ToString(), fileName);
+
+        if (File.Exists(filePath))
         {
-            throw new NullReferenceException("make sure the initialize method is called first");
+            return File.ReadAllText(filePath);
         }
 
-        string getUrl = $"/{day.date.Year}/day/{day.date.Day}/input";
-        HttpResponseMessage response = await client.GetAsync(getUrl);
+        Logger.Warning($"the file \'{fileName}\' does not exist, creating...");
 
         try
         {
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
-
+            File.Create(filePath).Dispose();
         }
-        catch (HttpRequestException e)
+        catch (DirectoryNotFoundException exception)
         {
-            Logger.Error(e.Message);
-            return string.Empty;
+            Logger.Error(exception.Message);
         }
-    }
 
-    internal static string ReadExample(this IDay day)
-    {
-        string fileName = $"day-{day.date.Day:D2}.example";
-        string filePath = Path.Combine(Directory.GetCurrentDirectory(), "examples",
-            day.date.Year.ToString(), fileName);
-
-        if (!File.Exists(filePath))
+        if (!isExampleMode)
         {
-            Logger.Error($"the file \'{fileName}\' does not exist, creating...");
+            if (client is null || handler is null)
+            {
+                throw new NullReferenceException("make sure the initialize method is called first");
+            }
 
-            try { File.Create(filePath); }
-            catch (DirectoryNotFoundException exception) { Logger.Error(exception.Message); }
+            Logger.Info($"requesting input for {day.date:dd-yy} from adventofcode.com ...");
+            string getUrl = $"/{day.date.Year}/day/{day.date.Day}/input";
+            HttpResponseMessage response = await client.GetAsync(getUrl);
 
-            return string.Empty;
+            try
+            {
+                response.EnsureSuccessStatusCode();
+                string content = await response.Content.ReadAsStringAsync();
+                File.WriteAllText(filePath, content);
+            }
+            catch (HttpRequestException e)
+            {
+                Logger.Error(e.Message);
+                return string.Empty;
+            }
         }
 
         return File.ReadAllText(filePath);
@@ -72,9 +78,9 @@ internal static class DataFetcher
         {
             throw new FileLoadException("the aoc.cookies file is empty!");
         }
-      
+
         sessionID = fileContents[0];
-        
+
         // Setup the http client.
         handler = new HttpClientHandler() { CookieContainer = new CookieContainer() };
         handler.CookieContainer.Add(new("https://www.adventofcode.com"),
