@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Battery = (byte value, int index);
 
 namespace advent_of_code.days;
 
@@ -12,12 +12,13 @@ internal class Day0325 : IDay
         string[] lines = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
         batteryBanks = new byte[lines.Length][];
 
+        // parse data into a array of byte arrays.
         for (int i = 0; i < lines.Length; i++)
         {
             batteryBanks[i] = new byte[lines[i].Length];
             for (int ii = 0; ii < batteryBanks[i].Length; ii++)
             {
-                batteryBanks[i][ii] = (byte)Char.GetNumericValue(lines[i][ii]);
+                batteryBanks[i][ii] = (byte)char.GetNumericValue(lines[i][ii]);
             }
         }
     }
@@ -28,10 +29,8 @@ internal class Day0325 : IDay
 
         for (int i = 0; i < batteryBanks.Length; i++)
         {
-            (byte value, int index) first =
-                FindHighestInBatteryBank(i, 0, batteryBanks[i].Length - 1);
-            (byte value, int index) second =
-                FindHighestInBatteryBank(i, first.index + 1, batteryBanks[i].Length);
+            Battery first = FindHighestInBatteryBank(i, 0, batteryBanks[i].Length - 1);
+            Battery second = FindHighestInBatteryBank(i, first.index + 1, batteryBanks[i].Length);
 
             int batteryOutput = (first.value * 10) + second.value;
             totalOutput += batteryOutput;
@@ -48,22 +47,15 @@ internal class Day0325 : IDay
         for (int i = 0; i < batteryBanks.Length; i++)
         {
             byte[] batteries = batteryBanks[i];
-            byte[] enabledBatteries = new byte[ENABLED_BATTERIES];
-            (byte value, int index) previousHighest = (0, -1);
+            Battery battery = (0, -1);
+            
+            long bankTotal = 0;
 
             for (int ii = 0; ii < ENABLED_BATTERIES; ii++)
             {
                 int end = batteries.Length - (ENABLED_BATTERIES - (ii + 1));
-                previousHighest =
-                    FindHighestInBatteryBank(i, previousHighest.index + 1, end);
-                enabledBatteries[ii] = previousHighest.value;
-            }
-
-            long bankTotal = 0;
-            Array.Reverse(enabledBatteries);
-            for (int ii = 0; ii < enabledBatteries.Length; ii++)
-            {
-                bankTotal += enabledBatteries[ii] * (long)Math.Pow(10, ii);
+                battery = FindHighestInBatteryBank(i, battery.index + 1, end);
+                bankTotal = bankTotal * 10 + battery.value;
             }
 
             totalOutput += bankTotal;

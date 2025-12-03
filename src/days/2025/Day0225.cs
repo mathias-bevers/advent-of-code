@@ -1,7 +1,6 @@
-namespace advent_of_code.days;
-
-using System.Text.RegularExpressions;
 using Range = (long min, long max);
+
+namespace advent_of_code.days;
 
 internal class Day0225 : IDay
 {
