@@ -12,18 +12,18 @@ internal class Day0624 : IDay
     private const char VISITED_POINT = 'X';
     private const char OBSTACLE = '#';
 
-    private char[,] map = new char[0, 0];
+    private Grid<char> map = new(0, 0);
     private Vector2Int origin = new();
 
     public void PopulateData(string raw)
     {
         string[] rows = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
 
-        map = new char[rows.Length, rows[0].Length];
+        map = new Grid<char>(rows.Length, rows[0].Length);
 
-        for (int y = 0; y < rows.Length; ++y)
+        for (int y = 0; y < map.height; ++y)
         {
-            for (int x = 0; x < rows[y].Length; ++x)
+            for (int x = 0; x < map.width; ++x)
             {
 
                 char current = rows[y][x];
@@ -39,20 +39,13 @@ internal class Day0624 : IDay
 
     public string SolveStarOne()
     {
-        int width = map.GetLength(0);
-        int height = map.GetLength(1);
-        int limit = width * height * 10;
+        int limit = map.width * map.height * 10;
         int n = 0;
 
         Vector2Int position = origin;
         Vector2Int direction = new(0, 1);
 
-
-        if (map.Clone() is not char[,] copy)
-        {
-            Logger.Error("something went wrong during copying the map");
-            return "error";
-        }
+        Grid<char> copy = map.Copy();
 
         do
         {
@@ -62,7 +55,7 @@ internal class Day0624 : IDay
 
             Vector2Int next = position + new Vector2Int(direction.x, -direction.y);
 
-            if (!IsPointInGrid(next)) { break; }
+            if (!copy.InGrid(next.x, next.y)) { break; }
 
             if (copy[next.x, next.y] != OBSTACLE)
             {
@@ -76,15 +69,12 @@ internal class Day0624 : IDay
 
         int visited = 0;
 
-        for (int y = 0; y < height; ++y)
+        copy.Loop((c, position) =>
         {
-            for (int x = 0; x < width; ++x)
-            {
-                if (copy[x, y] != VISITED_POINT) { continue; }
+            if (c != VISITED_POINT) { return; }
 
-                ++visited;
-            }
-        }
+            ++visited;
+        });
 
         return visited.ToString();
     }
@@ -93,27 +83,21 @@ internal class Day0624 : IDay
     {
         int infinites = 0;
 
-        for (int y = 0; y < map.GetLength(1); ++y)
+        map.Loop((current, position) =>
         {
-            for (int x = 0; x < map.GetLength(0); ++x)
+            if (current == OBSTACLE) { return; }
+
+            map[position.x, position.y] = OBSTACLE;
+
+            if (!IsInfinite())
             {
-                char current = map[x, y];
-
-                if (current == OBSTACLE) { continue; }
-
-                map[x, y] = OBSTACLE;
-
-                if (!IsInfinite())
-                {
-                    map[x, y] = current;
-                    continue;
-                }
-
-                ++infinites;
-                map[x, y] = 'O';
+                map[position.x, position.y] = current;
+                return;
             }
-        }
 
+            ++infinites;
+            map[position.x, position.y] = 'O';
+        });
 
         return infinites.ToString();
 
@@ -129,7 +113,10 @@ internal class Day0624 : IDay
                 n++;
                 Vector2Int next = position + new Vector2Int(direction.x, -direction.y);
 
-                if (!IsPointInGrid(next)) { return false; }
+                if (!map.InGrid(next.x, next.y))
+                {
+                    return false;
+                }
                 else if (map[next.x, next.y] == OBSTACLE)
                 {
                     direction.RotateDegrees(-90);
@@ -147,14 +134,5 @@ internal class Day0624 : IDay
 
             throw new Exception("fail save has activated");
         }
-    }
-
-    private bool IsPointInGrid(Vector2Int point)
-    {
-        if (point.x < 0 || point.y < 0) { return false; }
-
-        if (point.x >= map.GetLength(0) || point.y >= map.GetLength(1)) { return false; }
-
-        return true;
     }
 }
