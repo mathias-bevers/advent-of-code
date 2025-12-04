@@ -1,4 +1,3 @@
-
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -9,18 +8,18 @@ internal class Day0824 : IDay
 
     private const char EMPTY = '.';
 
-
-    private char[,] grid = new char[0, 0];
+    private Grid<char> grid = new(0, 0);
     Dictionary<char, List<Vector2Int>> antennas = [];
 
     public void PopulateData(string raw)
     {
         string[] rows = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
-        grid = new char[rows.Length, rows[0].Length];
 
-        for (int y = 0; y < grid.GetLength(1); ++y)
+        grid = new Grid<char>(rows.Length, rows[0].Length);
+
+        for (int y = 0; y < grid.height; ++y)
         {
-            for (int x = 0; x < grid.GetLength(0); ++x)
+            for (int x = 0; x < grid.width; ++x)
             {
                 char current = rows[y][x];
 
@@ -28,7 +27,7 @@ internal class Day0824 : IDay
 
                 if (current == EMPTY) { continue; }
 
-                if (!antennas.TryAdd(current, new List<Vector2Int>() { new(x, y) }))
+                if (!antennas.TryAdd(current, [new(x, y)]))
                 {
                     antennas[current].Add(new Vector2Int(x, y));
                 }
@@ -53,7 +52,10 @@ internal class Day0824 : IDay
                     Vector2Int possibleLocation = (collection[iii] - collection[ii]) * -1;
                     possibleLocation += collection[ii];
 
-                    if (!IsPointInGrid(possibleLocation)) { continue; }
+                    if (!grid.InGrid(possibleLocation.x, possibleLocation.y))
+                    {
+                        continue;
+                    }
 
                     antinodes.Add(possibleLocation);
                 }
@@ -80,7 +82,7 @@ internal class Day0824 : IDay
                     Vector2Int offset = (collection[iii] - collection[ii]) * -1;
                     Vector2Int current = collection[ii];
 
-                    while (IsPointInGrid(current))
+                    while (grid.InGrid(current.x, current.y))
                     {
                         antinodes.Add(current);
 
@@ -91,14 +93,5 @@ internal class Day0824 : IDay
         }
 
         return (antinodes.Count).ToString();
-    }
-
-    private bool IsPointInGrid(Vector2Int point)
-    {
-        if (point.x < 0 || point.x >= grid.GetLength(0)) { return false; }
-
-        if (point.y < 0 || point.y >= grid.GetLength(1)) { return false; }
-
-        return true;
     }
 }
