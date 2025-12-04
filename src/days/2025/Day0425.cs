@@ -9,40 +9,39 @@ internal class Day0425 : IDay
     public DateTime date { get; } = new(2025, 12, 04);
 
     private const char ROLL = '@';
-    private const char REMOVED_ROLL = 'x';
-    private char[,] paperRolls = new char[0, 0];
+    private const char REMOVED_ROLL = '.';
+
+    private Grid<char> original = new(0, 0);
 
     public void PopulateData(string raw)
     {
         string[] lines = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
-        paperRolls = new char[lines[0].Length, lines.Length];
+        original = new Grid<char>(lines[0].Length, lines.Length);
 
-        for (int y = 0; y < paperRolls.GetLength(1); y++)
+        for (int y = 0; y < original.height; y++)
         {
-            for (int x = 0; x < paperRolls.GetLength(0); x++)
+            for (int x = 0; x < original.width; x++)
             {
-                paperRolls[x, y] = lines[y][x];
+                original[x, y] = lines[y][x];
             }
         }
     }
 
     public string SolveStarOne()
     {
-        char[,] grid = paperRolls.Clone() as char[,] ??
-            throw new NullReferenceException("cannot copy array.");
-        int accesibleCount = GetAccesibleRolls(1, ref grid);
+        Grid<char> grid = original.Copy();
+        int accesibleCount = GetAccesibleRolls(1, grid);
         return accesibleCount.ToString();
     }
 
     public string SolveStarTwo()
     {
-        char[,] grid = paperRolls.Clone() as char[,] ??
-            throw new NullReferenceException("cannot copy array.");
-        int accesibleCount = GetAccesibleRolls(10000, ref grid);
+        Grid<char> grid = original.Copy();
+        int accesibleCount = GetAccesibleRolls(10000, grid);
         return accesibleCount.ToString();
     }
 
-    private int GetAccesibleRolls(int depth, ref char[,] grid)
+    private int GetAccesibleRolls(int depth, Grid<char> grid)
     {
         if (depth == 0)
         {
@@ -53,26 +52,23 @@ internal class Day0425 : IDay
 
         List<(int x, int y)> removedRolls = [];
 
-        for (int y = 0; y < grid.GetLength(1); y++)
+        grid.Loop((roll, position) =>
         {
-            for (int x = 0; x < grid.GetLength(0); x++)
+            if (roll != ROLL)
             {
-                if (grid[x, y] != ROLL)
-                {
-                    continue;
-                }
-
-                int neighborCount = GetNeighborCount(x, y, ref grid);
-
-                if (neighborCount >= 4)
-                {
-                    continue;
-                }
-
-                removedRolls.Add((x, y));
-                ++accesibleCount;
+                return;
             }
-        }
+
+            int neighborCount = GetNeighborCount(position.x, position.y, grid);
+
+            if (neighborCount >= 4)
+            {
+                return;
+            }
+
+            removedRolls.Add((position.x, position.y));
+            ++accesibleCount;
+        });
 
         if (accesibleCount == 0) { return 0; }
 
@@ -81,10 +77,10 @@ internal class Day0425 : IDay
             grid[removedRolls[i].x, removedRolls[i].y] = REMOVED_ROLL;
         }
 
-        return accesibleCount + GetAccesibleRolls(depth - 1, ref grid);
+        return accesibleCount + GetAccesibleRolls(depth - 1, grid);
     }
 
-    private int GetNeighborCount(int x, int y, ref char[,] grid)
+    private int GetNeighborCount(int x, int y, Grid<char> grid)
     {
         int neighborCount = 0;
 
@@ -100,15 +96,7 @@ internal class Day0425 : IDay
                 int nX = x + ii;
                 int nY = y + i;
 
-                if (nX < 0 || nY < 0)
-                {
-                    continue;
-                }
-
-                if (nX >= grid.GetLength(0) || nY >= grid.GetLength(1))
-                {
-                    continue;
-                }
+                if (!grid.InGrid(nX, nY)) { continue; }
 
                 if (grid[nX, nY] != ROLL)
                 {
