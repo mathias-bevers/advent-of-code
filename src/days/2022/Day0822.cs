@@ -1,20 +1,23 @@
-﻿namespace advent_of_code.days;
+﻿using advent_of_code.utils;
+
+namespace advent_of_code.days;
 
 public class Day0822 : IDay
 {
     public DateTime date { get; } = new(2022, 12, 08);
 
-    private Tree[,] trees = new Tree[0, 0];
+    // private Tree[,] trees = new Tree[0, 0];
+    private Grid<Tree> trees = new(0, 0);
 
     public void PopulateData(string raw)
     {
         string[] rowsAsStrings = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
 
-        trees = new Tree[rowsAsStrings[0].Length, rowsAsStrings.Length];
+        trees = new Grid<Tree>(rowsAsStrings[0].Length, rowsAsStrings.Length);
 
-        for (int y = 0; y < trees.GetLength(0); y++)
+        for (int y = 0; y < trees.height; y++)
         {
-            for (int x = 0; x < trees.GetLength(1); x++)
+            for (int x = 0; x < trees.width; x++)
             {
                 int height = (int)char.GetNumericValue(rowsAsStrings[y][x]);
                 trees[x, y] = new Tree(height, x, y);
@@ -26,14 +29,14 @@ public class Day0822 : IDay
     {
         int visibleTreeCount = 0;
 
-        foreach (Tree tree in trees)
+        trees.Loop((tree, position) =>
         {
             SetTreeVisibilityAndScore(tree);
 
-            if (!tree.IsVisible) { continue; }
+            if (!tree.IsVisible) { return; }
 
             ++visibleTreeCount;
-        }
+        });
 
         return visibleTreeCount.ToString();
     }
@@ -41,7 +44,7 @@ public class Day0822 : IDay
 
     public string SolveStarTwo()
     {
-        IEnumerable<Tree> sortedByScore = trees.Cast<Tree>().ToList().OrderByDescending(t => t.ScenicScore);
+        IEnumerable<Tree> sortedByScore = trees.As1D().ToList().OrderByDescending(t => t.ScenicScore);
         return sortedByScore.First().ScenicScore.ToString();
     }
 
@@ -50,9 +53,9 @@ public class Day0822 : IDay
         Tree.Direction visibleSides = Tree.Direction.ALL;
         int[] scores = { 0, 0, 0, 0 };
 
-        if (tree.PositionX != trees.GetLength(0) - 1)
+        if (tree.PositionX != trees.width - 1)
         {
-            for (int x = tree.PositionX + 1; x < trees.GetLength(0); ++x)
+            for (int x = tree.PositionX + 1; x < trees.width; ++x)
             {
                 ++scores[0];
                 if (tree.Height > trees[x, tree.PositionY].Height) { continue; }
@@ -74,9 +77,9 @@ public class Day0822 : IDay
             }
         }
 
-        if (tree.PositionY != trees.GetLength(1) - 1)
+        if (tree.PositionY != trees.height - 1)
         {
-            for (int y = tree.PositionY + 1; y < trees.GetLength(1); ++y)
+            for (int y = tree.PositionY + 1; y < trees.height; ++y)
             {
                 ++scores[2];
                 if (tree.Height > trees[tree.PositionX, y].Height) { continue; }
