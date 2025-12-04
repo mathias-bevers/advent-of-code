@@ -20,7 +20,7 @@ internal class Grid<T>
         {
             if (!InGrid(x, y))
             {
-                throw new IndexOutOfRangeException($"[{x}{y}] is not in the bounds of the grid.");
+                throw new IndexOutOfRangeException($"[{x},{y}] is not in the bounds of the grid.");
             }
 
             return grid[x, y];
@@ -29,7 +29,7 @@ internal class Grid<T>
         {
             if (!InGrid(x, y))
             {
-                throw new IndexOutOfRangeException($"[{x}{y}] is not in the bounds of the grid.");
+                throw new IndexOutOfRangeException($"[{x},{y}] is not in the bounds of the grid.");
             }
 
             grid[x, y] = value;
