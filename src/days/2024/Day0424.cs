@@ -7,7 +7,7 @@ internal class Day0424 : IDay
 {
     public DateTime date { get; } = new(2024, 12, 04);
 
-    private char[,] grid = new char[0, 0];
+    private Grid<char> grid = new(0, 0);
     private readonly Dictionary<int, char> searchingCharacters =
         new() { { 1, 'M' }, { 2, 'A' }, { 3, 'S' } };
     private readonly Vector2Int[] directions = [
@@ -24,11 +24,11 @@ internal class Day0424 : IDay
     public void PopulateData(string raw)
     {
         string[] rows = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
-        grid = new char[rows[0].Length, rows.Length];
+        grid = new Grid<char>(rows[0].Length, rows.Length);
 
-        for (int y = 0; y < rows.Length; ++y)
+        for (int y = 0; y < grid.height; ++y)
         {
-            for (int x = 0; x < rows[y].Length; ++x)
+            for (int x = 0; x < grid.width; ++x)
             {
                 grid[x, y] = rows[y][x];
             }
@@ -39,45 +39,35 @@ internal class Day0424 : IDay
     {
         int occurance = 0;
 
-        for (int y = 0; y < grid.GetLength(1); ++y)
+        grid.Loop((letter, origin) =>
         {
-            for (int x = 0; x < grid.GetLength(0); ++x)
+            if (letter != 'X') { return; }
+
+            for (int i = 0; i < directions.Length; ++i)
             {
-                if (grid[x, y] != 'X') { continue; }
-                Vector2Int origin = new(x, y);
+                bool isValid = true;
 
-                for (int i = 0; i < directions.Length; ++i)
+                for (int ii = 1; ii <= 3; ++ii)
                 {
-                    bool isValid = true;
+                    Vector2Int position = origin + (directions[i] * ii);
 
-                    for (int ii = 1; ii <= 3; ++ii)
+                    if (!grid.InGrid(position.x, position.y))
                     {
-                        Vector2Int position = origin + (directions[i] * ii);
-
-                        if (position.x < 0 || position.x >= grid.GetLength(0))
-                        {
-                            isValid = false;
-                            break;
-                        }
-
-                        if (position.y < 0 || position.y >= grid.GetLength(1))
-                        {
-                            isValid = false;
-                            break;
-                        }
-
-                        if (grid[position.x, position.y] != searchingCharacters[ii])
-                        {
-                            isValid = false;
-                            break;
-                        }
+                        isValid = false;
+                        break;
                     }
 
-                    if (!isValid) { continue; }
-                    ++occurance;
+                    if (grid[position.x, position.y] != searchingCharacters[ii])
+                    {
+                        isValid = false;
+                        break;
+                    }
                 }
+
+                if (!isValid) { continue; }
+                ++occurance;
             }
-        }
+        });
 
         return occurance.ToString();
     }
@@ -85,39 +75,36 @@ internal class Day0424 : IDay
     public string SolveStarTwo()
     {
         int occurance = 0;
-        for (int y = 0; y < grid.GetLength(1); ++y)
+
+        grid.Loop((letter, origin) =>
         {
-            for (int x = 0; x < grid.GetLength(0); ++x)
+            if (letter != 'A') { return; }
+
+            string s = string.Empty;
+
+            for (int i = 1; i < directions.Length; i += 2)
             {
-                if (grid[x, y] != 'A') { continue; }
+                Vector2Int position = origin + directions[i];
 
-                Vector2Int origin = new(x, y);
-                string s = string.Empty;
-
-                for (int i = 1; i < directions.Length; i += 2)
+                if (!grid.InGrid(position.x, position.y))
                 {
-                    Vector2Int position = origin + directions[i];
-
-                    if (position.x < 0 || position.x >= grid.GetLength(0)) { break; }
-
-                    if (position.y < 0 || position.y >= grid.GetLength(1)) { break; }
-
-                    char current = grid[position.x, position.y];
-
-                    if (current != 'M' && current != 'S') { break; }
-
-                    s += current;
+                    return;
                 }
 
-                if (s.Length != 4) { continue; }
+                char current = grid[position.x, position.y];
 
-                if (s[0] == s[2] || s[1] == s[3]) { continue; }
+                if (current != 'M' && current != 'S') { break; }
 
-                // if (s.Count(c => c == 'M') != 2 || s.Count(c => c == 'S') != 2) { continue; }
-
-                ++occurance;
+                s += current;
             }
-        }
+
+            if (s.Length != 4) { return; }
+
+            if (s[0] == s[2] || s[1] == s[3]) { return; }
+            
+            ++occurance;
+        });
+
         return occurance.ToString();
     }
 }
