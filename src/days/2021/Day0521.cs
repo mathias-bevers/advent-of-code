@@ -6,14 +6,15 @@ public class Day0521 : IDay
 {
     public DateTime date { get; } = new(2021, 12, 05);
 
-    private int[,] grid = new int[0, 0];
+    // private int[,] grid = new int[0, 0];
+    private Grid<int> grid = new(0, 0);
     private Line[] lines = [];
 
     public void PopulateData(string raw)
     {
         List<Line> lineList = [];
         string[] dataLines = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
-        grid = dataLines.Length == 10 ? new int[10, 10] : new int[991, 990];
+        grid = dataLines.Length == 10 ? new Grid<int>(10, 10) : new Grid<int>(991, 990);
 
         foreach (string asLine in dataLines)
         {
@@ -54,7 +55,7 @@ public class Day0521 : IDay
             }
         }
 
-        return grid.Cast<int>().Count(i => i >= 2).ToString();
+        return grid.As1D().Count(i => i >= 2).ToString();
     }
 
     public string SolveStarTwo()
@@ -70,9 +71,9 @@ public class Day0521 : IDay
                 {
                     Vector2Int currentPosition = new(x, y);
 
-                    if(currentPosition == line.Start || currentPosition == line.End) 
+                    if (currentPosition == line.Start || currentPosition == line.End)
                     {
-                        ++grid[x,y];
+                        ++grid[x, y];
                         continue;
                     }
 
@@ -85,7 +86,7 @@ public class Day0521 : IDay
             }
         }
 
-        return grid.Cast<int>().Count(i => i >= 2).ToString();
+        return grid.As1D().Count(i => i >= 2).ToString();
     }
 
     private readonly struct Line

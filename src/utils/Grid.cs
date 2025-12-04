@@ -70,6 +70,11 @@ internal class Grid<T>
         }
     }
 
+    public IEnumerable<T> As1D()
+    {
+        return grid.Cast<T>();
+    }
+
     public override string ToString()
     {
         System.Text.StringBuilder sb = new($"Grid[{width},{height}] of {typeof(T).Name}");
