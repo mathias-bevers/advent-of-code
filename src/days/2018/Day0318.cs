@@ -1,4 +1,5 @@
-﻿using advent_of_code.utils;
+﻿using System.ComponentModel;
+using advent_of_code.utils;
 
 namespace advent_of_code.days;
 
@@ -6,7 +7,9 @@ public class DayThree : IDay
 {
     public DateTime date { get; } = new(2018, 12, 03);
 
-    private readonly char[,] grid = new char[999, 997];
+    // private readonly char[,] grid = new char[999, 997];
+    private readonly Grid<char> grid = new (999, 997);
+
     private ElfClaim[] elfClaims = [];
 
     public void PopulateData(string raw)
@@ -51,15 +54,15 @@ public class DayThree : IDay
         }
 
         int occupiedMultipleTimesCount = 0;
-        for (int x = 0; x < grid.GetLength(0); ++x)
-        {
-            for (int y = 0; y < grid.GetLength(1); ++y)
-            {
-                if (grid[x, y] != 'x') { continue; }
 
-                occupiedMultipleTimesCount++;
+        grid.Loop((c, position) => {
+            if(c != 'x') 
+            {
+                return;
             }
-        }
+
+            ++occupiedMultipleTimesCount;
+        });
 
         return occupiedMultipleTimesCount.ToString();
     }

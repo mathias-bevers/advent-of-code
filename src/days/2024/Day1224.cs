@@ -1,6 +1,3 @@
-
-using System.ComponentModel.Design;
-using System.Data;
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -9,9 +6,7 @@ internal class Day1224 : IDay
 {
     public DateTime date { get; } = new DateTime(2024, 12, 12);
 
-    private int width = 0;
-    private int height = 0;
-    private Plot[,] grid = new Plot[0, 0];
+    private Grid<Plot> plots = new(0, 0);
     private Region[] regions = [];
 
     private readonly Vector2Int[] directions = [
@@ -29,30 +24,25 @@ internal class Day1224 : IDay
     public void PopulateData(string raw)
     {
         string[] rows = raw.Split(Utils.NEW_LINES, StringSplitOptions.RemoveEmptyEntries);
-        grid = new Plot[rows.Length, rows[0].Length];
-        width = grid.GetLength(0);
-        height = grid.GetLength(1);
+        plots = new Grid<Plot>(rows.Length, rows[0].Length);
 
-        for (int y = 0; y < height; ++y)
+        for (int y = 0; y < plots.height; ++y)
         {
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < plots.width; ++x)
             {
-                grid[x, y] = new Plot(rows[y][x], new Vector2Int(x, y), null);
+                plots[x, y] = new Plot(rows[y][x], new Vector2Int(x, y), null);
             }
         }
 
         List<Region> tmp = [];
-        for (int y = 0; y < height; ++y)
+        plots.Loop((plot, position) =>
         {
-            for (int x = 0; x < width; ++x)
-            {
-                Plot plot = grid[x, y];
 
-                if (plot.parent != null) { continue; }
+            if (plot.parent != null) { return; }
 
-                tmp.Add(GenerateRegion(plot));
-            }
-        }
+            tmp.Add(GenerateRegion(plot));
+
+        });
 
         regions = [.. tmp];
     }
@@ -145,12 +135,11 @@ internal class Day1224 : IDay
             dir.RotateDegrees(-90);
             Vector2Int neighborLocation = location + dir;
 
-            if (neighborLocation.x < 0 || neighborLocation.y < 0) { continue; }
-            if (neighborLocation.x >= width || neighborLocation.y >= height) { continue; }
+            if (!plots.InGrid(neighborLocation.x, neighborLocation.y)) { continue; }
 
-            Plot neighbor = grid[neighborLocation.x, neighborLocation.y];
+            Plot neighbor = plots[neighborLocation.x, neighborLocation.y];
 
-            if (neighbor.identifier != grid[location.x, location.y].identifier) { continue; }
+            if (neighbor.identifier != plots[location.x, location.y].identifier) { continue; }
 
             neighbors.Add(neighbor);
         }
