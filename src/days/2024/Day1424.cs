@@ -38,8 +38,7 @@ internal class Day1424 : IDay
 
     public string SolveStarOne()
     {
-        int[,] grid = new int[0, 0];
-        grid = new int[gridSize.x, gridSize.y];
+        Grid<int> grid = new(gridSize.x, gridSize.y);
 
         for (int i = 0; i < robots.Length; ++i)
         {
@@ -94,7 +93,7 @@ internal class Day1424 : IDay
         int maxValue = 10_000;
         for (int i = 0; i < maxValue; ++i)
         {
-            int[,] grid = new int[gridSize.x, gridSize.y];
+            Grid<int> grid = new(gridSize.x, gridSize.y);
 
             for (int ii = 0; ii < robots.Length; ++ii)
             {
@@ -104,22 +103,16 @@ internal class Day1424 : IDay
             }
 
             sb.AppendLine("P1");
-            sb.Append($"{gridSize.x} {gridSize.y}");
-
-            for (int y = 0; y < gridSize.y; ++y)
-            {
-                sb.AppendLine();
-                for (int x = 0; x < gridSize.x; ++x)
-                {
-                    sb.Append(grid[x, y]);
-                }
-            }
+            sb.AppendLine($"{gridSize.x} {gridSize.y}");
+            string gridAsString = grid.ToString();
+            int n = gridAsString.IndexOf('\n') + 1;
+            sb.Append(gridAsString[n..]);
 
             File.WriteAllText(Path.Combine(outputFolderPath, $"iteration{i:0000}.pbm"),
                 sb.ToString());
             sb.Clear();
         }
-
+        
         Logger.Info("written images to: " + outputFolderPath);
         return "see output folder!";
     }
