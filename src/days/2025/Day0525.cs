@@ -1,4 +1,4 @@
-using Range = (uint min, uint max);
+using Range = (long min, long max);
 
 namespace advent_of_code.days;
 
@@ -7,7 +7,7 @@ internal class Day0525 : IDay
     public DateTime date { get; } = new(2025, 12, 05);
 
     private Range[] ranges = [];
-    private uint[] ids = [];
+    private long[] ids = [];
 
     public void PopulateData(string raw)
     {
@@ -20,23 +20,46 @@ internal class Day0525 : IDay
         for (int i = 0; i < ranges.Length; ++i)
         {
             string[] range = rangeStrings[i].Split('-');
-            ranges[i].min = uint.Parse(range[0]);
-            ranges[i].max = uint.Parse(range[1]);
+            ranges[i].min = long.Parse(range[0]);
+            ranges[i].max = long.Parse(range[1]);
         }
 
         // parse the ids.
         string[] idStrings = blocks[1].Split(Utils.NEW_LINES,
                                              StringSplitOptions.RemoveEmptyEntries);
-        ids = new uint[idStrings.Length];
+        ids = new long[idStrings.Length];
         for (int i = 0; i < ids.Length; ++i)
         {
-            ids[i] = uint.Parse(idStrings[i]);
+            ids[i] = long.Parse(idStrings[i]);
         }
     }
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        long freshIngredients = 0;
+
+        for (int i = 0; i < ids.Length; ++i)
+        {
+            for (int ii = 0; ii < ranges.Length; ++ii)
+            {
+                // check if in range
+                if(ids[i] < ranges[ii].min)
+                {
+                    continue;
+                }
+
+                if(ids[i] > ranges[ii].max)
+                {
+                    continue;
+                }
+
+                // increase the fresh ingredient count and break so it will not double count.
+                ++freshIngredients;
+                break;
+            }
+        }
+
+        return freshIngredients.ToString();
     }
 
     public string SolveStarTwo()
