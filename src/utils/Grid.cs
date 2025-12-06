@@ -53,8 +53,10 @@ internal class Grid<T>
 
     public Grid<T> Copy()
     {
-        Grid<T> copy = new Grid<T>(width, height);
-        copy.grid = (T[,])grid.Clone();
+        Grid<T> copy = new(width, height)
+        {
+            grid = (T[,])grid.Clone()
+        };
 
         return copy;
     }
@@ -75,6 +77,38 @@ internal class Grid<T>
         return grid.Cast<T>();
     }
 
+    public T[] GetColumn(int column)
+    {
+        if (column >= width)
+        {
+            throw new ArgumentOutOfRangeException($"column \'{column}\' is too big.");
+        }
+
+        List<T> collection = new(height);
+        for (int i = 0; i < height; i++)
+        {
+            collection.Add(grid[column, i]);
+        }
+
+        return [.. collection];
+    }
+
+    public T[] GetRow(int row)
+    {
+        if (row >= height)
+        {
+            throw new ArgumentOutOfRangeException($"row \'{row}\' is too big.");
+        }
+
+        List<T> collection = new(width);
+        for (int i = 0; i < width; i++)
+        {
+            collection.Add(grid[i, row]);
+        }
+
+        return [.. collection];
+    }
+
     public override string ToString()
     {
         System.Text.StringBuilder sb = new($"Grid[{width},{height}] of {typeof(T).Name}");
@@ -85,6 +119,7 @@ internal class Grid<T>
             for (int x = 0; x < width; x++)
             {
                 sb.Append(grid[x, y]);
+                sb.Append(' ');
             }
         }
 
