@@ -75,6 +75,38 @@ internal class Grid<T>
         return grid.Cast<T>();
     }
 
+    public T[] GetColumn(int column)
+    {
+        if (column >= width)
+        {
+            throw new ArgumentOutOfRangeException($"column \'{column}\' is too big.");
+        }
+
+        List<T> collection = new(height);
+        for (int i = 0; i < height; i++)
+        {
+            collection.Add(grid[column, i]);
+        }
+
+        return [.. collection];
+    }
+
+    public T[] GetRow(int row)
+    {
+        if (row >= height)
+        {
+            throw new ArgumentOutOfRangeException($"row \'{row}\' is too big.");
+        }
+
+        List<T> collection = new(width);
+        for (int i = 0; i < width; i++)
+        {
+            collection.Add(grid[i, row]);
+        }
+
+        return [.. collection];
+    }
+
     public override string ToString()
     {
         System.Text.StringBuilder sb = new($"Grid[{width},{height}] of {typeof(T).Name}");

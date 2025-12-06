@@ -45,13 +45,32 @@ internal class Day0625 : IDay
                 problems[x,y] = tmp[y][x];
             }
         }
-
-        Logger.Info(problems);
     }
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        long result = 0;
+
+        for (int x = 0; x < problems.width; x++)
+        {
+            int[] column = problems.GetColumn(x);
+            long columnResult = column[0];
+            for (int y = 1; y < column.Length; y++)
+            {
+                if(operators[x] == '+')
+                {
+                    columnResult += column[y];
+                }
+                else
+                {
+                    columnResult *= column[y];
+                }
+            }
+
+            result += columnResult;
+        }
+
+        return result.ToString();
     }
 
     public string SolveStarTwo()
