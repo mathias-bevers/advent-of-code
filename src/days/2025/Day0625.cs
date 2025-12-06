@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -99,13 +100,14 @@ internal class Day0625 : IDay
         long result = 0;
         int operatorIndex = 0;
         int digidLimit = columnDigids[0];
-        List<int> columnValues = []; ;
+        List<long> columnValues = []; ;
 
         for (int x = 0; x < problemsS2.width; ++x)
         {
             if (x == digidLimit)
             {
-                result += GetColumnResult(columnValues, operatorIndex);
+                result += operators[operatorIndex] == '+' ? columnValues.Sum() 
+                                                          : columnValues.Product();
 
                 columnValues.Clear();
                 ++operatorIndex;
@@ -128,23 +130,8 @@ internal class Day0625 : IDay
         }
 
         // repeat one more time for the last column
-        result += GetColumnResult(columnValues, operatorIndex);
+        result += operators[operatorIndex] == '+' ? columnValues.Sum() : columnValues.Product();
 
         return result.ToString();
-    }
-
-    private long GetColumnResult(List<int> columnValues, int operatorIndex)
-    {
-        long result;
-        if (operators[operatorIndex] == '+')
-        {
-            result = columnValues.Sum();
-        }
-        else
-        {
-            result = columnValues.Product();
-        }
-
-        return result;
     }
 }
