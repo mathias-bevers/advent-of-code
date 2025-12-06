@@ -1,4 +1,3 @@
-using System.Net.Security;
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -7,7 +6,10 @@ internal class Day0625 : IDay
 {
     public DateTime date { get; } = new(2025, 12, 06);
 
-    private Grid<int> problems = new(0, 0);
+    private Grid<short> problemsS1 = new(0, 0);
+    private Grid<byte> problemsS2 = new(0, 0);
+    private byte[] columnDigids = [];
+
     private char[] operators = [];
 
     public void PopulateData(string raw)
@@ -22,27 +24,46 @@ internal class Day0625 : IDay
             operators[i] = stringOperators[i][0];
         }
 
+        problemsS1 = new Grid<short>(operators.Length, lines.Length - 1);
+        columnDigids = new byte[operators.Length];
         // skip the last line since it holds the opertators.
-        List<List<int>> tmp = new();
-        for (int i = 0; i < lines.Length - 1; ++i)
+        for (int y = 0; y < lines.Length - 1; ++y)
         {
-            List<int> innerTmp = new();
-            string[] numbers = lines[i].Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            for (int ii = 0; ii < numbers.Length; ++ii)
+            string[] numbers = lines[y].Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            for (int x = 0; x < numbers.Length; ++x)
             {
-                innerTmp.Add(int.Parse(numbers[ii]));
-            }
+                problemsS1[x, y] = short.Parse(numbers[x]);
 
-            tmp.Add(innerTmp);
+                if (numbers[x].Length <= columnDigids[x]) { continue; }
+
+                columnDigids[x] = (byte)numbers[x].Length;
+            }
         }
 
-        // parse tmp lists to grid.
-        problems = new Grid<int>(tmp[0].Count, tmp.Count);
-        for (int y = 0; y < problems.height; ++y)
+        // format the lines so the extra spaces are replaced with 0s.
+        string[] formattedLines = new string[lines.Length - 1];
+        for (int y = 0; y < formattedLines.Length; y++)
         {
-            for (int x = 0; x < problems.width; ++x)
+            string formattedLine = string.Empty;
+            int start = 0;
+            for (int i = 0; i < columnDigids.Length; ++i)
             {
-                problems[x,y] = tmp[y][x];
+                string substr = lines[y].Substring(start, columnDigids[i]);
+                substr = substr.Replace(' ', '0');
+                formattedLine += substr;
+                start += columnDigids[i] + 1;
+            }
+
+            formattedLines[y] = formattedLine;
+        }
+
+        // convert the formatted lines into a byte grid.
+        problemsS2 = new Grid<byte>(formattedLines[0].Length, formattedLines.Length);
+        for (int y = 0; y < problemsS2.height; y++)
+        {
+            for (int x = 0; x < problemsS2.width; x++)
+            {
+                problemsS2[x, y] = (byte)char.GetNumericValue(formattedLines[y][x]);
             }
         }
     }
@@ -51,13 +72,13 @@ internal class Day0625 : IDay
     {
         long result = 0;
 
-        for (int x = 0; x < problems.width; x++)
+        for (int x = 0; x < problemsS1.width; x++)
         {
-            int[] column = problems.GetColumn(x);
+            short[] column = problemsS1.GetColumn(x);
             long columnResult = column[0];
             for (int y = 1; y < column.Length; y++)
             {
-                if(operators[x] == '+')
+                if (operators[x] == '+')
                 {
                     columnResult += column[y];
                 }
@@ -75,6 +96,55 @@ internal class Day0625 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        long result = 0;
+        int operatorIndex = 0;
+        int digidLimit = columnDigids[0];
+        List<int> columnValues = []; ;
+
+        for (int x = 0; x < problemsS2.width; ++x)
+        {
+            if (x == digidLimit)
+            {
+                result += GetColumnResult(columnValues, operatorIndex);
+
+                columnValues.Clear();
+                ++operatorIndex;
+                digidLimit += columnDigids[operatorIndex];
+            }
+
+            byte[] column = problemsS2.GetColumn(x);
+            int columnValue = 0;
+            for (int y = 0; y < column.Length; y++)
+            {
+                if (column[y] == 0)
+                {
+                    continue;
+                }
+
+                columnValue = (columnValue * 10) + column[y];
+            }
+
+            columnValues.Add(columnValue);
+        }
+
+        // repeat one more time for the last column
+        result += GetColumnResult(columnValues, operatorIndex);
+
+        return result.ToString();
+    }
+
+    private long GetColumnResult(List<int> columnValues, int operatorIndex)
+    {
+        long result;
+        if (operators[operatorIndex] == '+')
+        {
+            result = columnValues.Sum();
+        }
+        else
+        {
+            result = columnValues.Product();
+        }
+
+        return result;
     }
 }

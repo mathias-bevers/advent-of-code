@@ -53,8 +53,10 @@ internal class Grid<T>
 
     public Grid<T> Copy()
     {
-        Grid<T> copy = new Grid<T>(width, height);
-        copy.grid = (T[,])grid.Clone();
+        Grid<T> copy = new(width, height)
+        {
+            grid = (T[,])grid.Clone()
+        };
 
         return copy;
     }
@@ -117,6 +119,7 @@ internal class Grid<T>
             for (int x = 0; x < width; x++)
             {
                 sb.Append(grid[x, y]);
+                sb.Append(' ');
             }
         }
 
