@@ -8,9 +8,10 @@ internal class Day0725 : IDay
 
     private const char START = 'S';
     private const char SPLITTER = '^';
+    private const char BEAM = '|';
 
     private Grid<char> manifold = new(0, 0);
-    private Vector2Int startPosition = new(0, 0);
+    private Vector2Int enteringPoint = new(0, 0);
 
     public void PopulateData(string raw)
     {
@@ -28,18 +29,50 @@ internal class Day0725 : IDay
                     continue;
                 }
 
-                startPosition = new Vector2Int(x, y);
+                enteringPoint = new Vector2Int(x, y);
             }
         }
     }
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        int timesSplit = 0;
+        Queue<Vector2Int> beams = new();
+        beams.Enqueue(enteringPoint);
+
+        while (beams.Count > 0)
+        {
+            Vector2Int beam = beams.Dequeue();
+
+            for (int y = beam.y; y < manifold.height; y++)
+            {
+                char current = manifold[beam.x, y];
+
+                if (current == SPLITTER)
+                {
+                    ++timesSplit;
+                    beams.Enqueue(new Vector2Int(beam.x - 1, y));
+                    beams.Enqueue(new Vector2Int(beam.x + 1, y));
+                    break;
+                }
+                else if (current == BEAM)
+                {
+                    break;
+                }
+                else
+                {
+                    manifold[beam.x, y] = BEAM;
+                    continue;
+                }
+            }
+        }
+        
+        return timesSplit.ToString();
     }
 
     public string SolveStarTwo()
     {
         throw new NotImplementedException();
     }
+
 }
