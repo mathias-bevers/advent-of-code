@@ -1,4 +1,7 @@
+using System.Diagnostics;
+using System.Security.Cryptography;
 using advent_of_code.utils;
+using Microsoft.VisualBasic;
 
 namespace advent_of_code.days;
 
@@ -11,6 +14,7 @@ internal class Day0725 : IDay
     private const char BEAM = '|';
 
     private Grid<char> manifold = new(0, 0);
+    private Graph<Vector2Int> splitters = new();
     private Vector2Int enteringPoint = new(0, 0);
 
     public void PopulateData(string raw)
@@ -51,8 +55,9 @@ internal class Day0725 : IDay
                 if (current == SPLITTER)
                 {
                     ++timesSplit;
-                    beams.Enqueue(new Vector2Int(beam.x - 1, y));
-                    beams.Enqueue(new Vector2Int(beam.x + 1, y));
+
+                    beams.Enqueue(new(beam.x - 1, y));
+                    beams.Enqueue(new(beam.x + 1, y));
                     break;
                 }
                 else if (current == BEAM)
@@ -66,13 +71,39 @@ internal class Day0725 : IDay
                 }
             }
         }
-        
+
         return timesSplit.ToString();
     }
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        Dictionary<Vector2Int, long> preCalculated = [];
+        long timeLines = GetTimeLines(enteringPoint, ref preCalculated);
+        return timeLines.ToString();
     }
 
+    public long GetTimeLines(Vector2Int start, ref Dictionary<Vector2Int, long> preCalculated)
+    {
+        if (preCalculated.TryGetValue(start, out long value))
+        {
+            return value;
+        }
+
+        for (int y = start.y; y < manifold.height; y++)
+        {
+            Vector2Int current = new(start.x, y);
+
+            if (manifold[current.x, current.y] != SPLITTER)
+            {
+                continue;
+            }
+
+            long count = GetTimeLines(new Vector2Int(start.x - 1, y), ref preCalculated) +
+                         GetTimeLines(new Vector2Int(start.x + 1, y), ref preCalculated);
+            preCalculated[start] = count;
+            return count;
+        }
+
+        return 1;
+    }
 }
