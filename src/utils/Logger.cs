@@ -72,9 +72,15 @@ public static class Logger
     {
         try
         {
-            if (append) { File.AppendAllText(LOG_PATH, Environment.NewLine + content); }
-            else { File.WriteAllText(LOG_PATH, content); }
-            Info("written log to: " + LOG_PATH);
+            if (append)
+            {
+                File.AppendAllText(LOG_PATH, Environment.NewLine + content);
+            }
+            else
+            {
+                File.WriteAllText(LOG_PATH, content);
+                Info("written log to: " + LOG_PATH);
+            }
         }
         catch (Exception e)
         {

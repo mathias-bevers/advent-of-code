@@ -11,16 +11,24 @@ internal static class Utils
 
     public static string FormatDateToString(this DateTime date) =>
          date.ToString("dd-MMM-yyyy").ToLower();
-         
+
     public static long Product<T>(this IEnumerable<T> collection) where T : INumber<T>
     {
         T result = T.One;
 
-        foreach(T number in collection)
+        foreach (T number in collection)
         {
             result *= number;
         }
 
         return long.CreateChecked(result);
+    }
+
+    public static void AddRange<T>(this HashSet<T> source, IEnumerable<T> range)
+    {
+        foreach (T item in range)
+        {
+            source.Add(item);
+        }
     }
 }
