@@ -14,7 +14,6 @@ internal class Day0725 : IDay
     private const char BEAM = '|';
 
     private Grid<char> manifold = new(0, 0);
-    private Graph<Vector2Int> splitters = new();
     private Vector2Int enteringPoint = new(0, 0);
 
     public void PopulateData(string raw)
