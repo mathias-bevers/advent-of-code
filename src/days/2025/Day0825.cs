@@ -1,4 +1,3 @@
-using System.Net;
 using advent_of_code.utils;
 using Connection = (int from, int to, double distance); // index, index, distance
 
@@ -102,6 +101,55 @@ internal class Day0825 : IDay
 
     public string SolveStarTwo()
     {
-        throw new NotImplementedException();
+        int circuitCount = junctionBoxes.Length;
+        int iteration = 0;
+
+        // create two arrays where circuits acts as a map for the sizes.
+        int[] circuits = new int[junctionBoxes.Length];
+        for (int i = 0; i < circuits.Length; i++)
+        {
+            circuits[i] = i;
+        }
+
+        while (circuitCount > 1)
+        {
+            if (iteration > 1_000_000)
+            {
+                throw new OverflowException("triggered fail save!");
+            }
+
+            Connection connection = connections[iteration];
+            int a = circuits[connection.from];
+            int b = circuits[connection.to];
+
+            ++iteration;
+
+            if (a == b)
+            {
+                continue;
+            }
+
+            // decrease the circuit count since we can connect one more and 
+            // save the last evaluated connection.
+            --circuitCount;
+
+            // find the tos in the map.
+            for (int ii = 0; ii < junctionBoxes.Length; ii++)
+            {
+                if (circuits[ii] != b)
+                {
+                    continue;
+                }
+
+                // point the to connection to the to connection.
+                circuits[ii] = a;
+            }
+        }
+
+        Connection lastConnected = connections[iteration - 1];
+        Logger.Info(lastConnected);
+
+        long result = junctionBoxes[lastConnected.from].x * junctionBoxes[lastConnected.to].x;
+        return result.ToString();
     }
 }
