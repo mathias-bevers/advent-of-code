@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using advent_of_code.utils;
 
 namespace advent_of_code.days;
@@ -35,7 +36,24 @@ internal class Day0925 : IDay
 
     public string SolveStarOne()
     {
-        throw new NotImplementedException();
+        ulong? largest = null;
+
+        for (int i = 0; i < rectangles.Length; i++)
+        {
+            if (largest > rectangles[i].area)
+            {
+                continue;
+            }
+
+            largest = rectangles[i].area;
+        }
+
+        if (!largest.HasValue)
+        {
+            throw new NullReferenceException("the largest area has not been found");
+        }
+
+        return largest.Value.ToString();
     }
 
     public string SolveStarTwo()
