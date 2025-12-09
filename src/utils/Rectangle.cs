@@ -54,6 +54,21 @@ internal struct Rectangle
         return new Rectangle(left, top, width, height);
     }
 
+    public Line[] ConvertToLines()
+    {
+        Line[] lines = new Line[4];
+        Vector2Int bottomRight = (position + size) - Vector2Int.one;
+        Vector2Int topRight = new(bottomRight.x, position.y);
+        Vector2Int bottomLeft = new(position.x, bottomRight.y);
+
+        lines[0] = new Line(position, topRight);
+        lines[1] = new Line(topRight, bottomRight);
+        lines[2] = new Line(bottomRight, bottomLeft);
+        lines[3] = new Line(bottomLeft, position);
+
+        return lines;
+    }
+
     public override readonly int GetHashCode()
     {
         return HashCode.Combine(size, position);
