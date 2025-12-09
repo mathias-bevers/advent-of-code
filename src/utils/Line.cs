@@ -4,8 +4,8 @@ internal struct Line
 {
     public Vector2Int start { get; }
     public Vector2Int end { get; }
-    public bool IsHorizontal => (this.start.x == this.end.x);
-    public bool IsVertical => (this.start.y == this.end.y);
+    public readonly bool IsHorizontal => start.y == end.y;
+    public readonly bool IsVertical => start.x == end.x;
 
     public Line(Vector2Int start, Vector2Int end)
     {
@@ -27,7 +27,7 @@ internal struct Line
         int d = (end.x - start.x) * (other.end.y - other.start.y) -
                 (end.y - start.y) * (other.end.x - other.start.x);
 
-        if (Math.Abs(d) < 0.001f)
+        if (Math.Abs(d) < 0.00001f)
         {
             return false;
         }

@@ -54,19 +54,15 @@ internal struct Rectangle
         return new Rectangle(left, top, width, height);
     }
 
-    public Line[] ConvertToLines()
+    public Vector2Int[] GetCorners()
     {
-        Line[] lines = new Line[4];
-        Vector2Int bottomRight = (position + size) - Vector2Int.one;
-        Vector2Int topRight = new(bottomRight.x, position.y);
-        Vector2Int bottomLeft = new(position.x, bottomRight.y);
+        Vector2Int[] corners = new Vector2Int[4];
+        corners[0] = position;
+        corners[2] = position + size - Vector2Int.one;
+        corners[1] = new(corners[2].x, position.y);
+        corners[3] = new(position.x, corners[2].y);
 
-        lines[0] = new Line(position, topRight);
-        lines[1] = new Line(topRight, bottomRight);
-        lines[2] = new Line(bottomRight, bottomLeft);
-        lines[3] = new Line(bottomLeft, position);
-
-        return lines;
+        return corners;
     }
 
     public override readonly int GetHashCode()
