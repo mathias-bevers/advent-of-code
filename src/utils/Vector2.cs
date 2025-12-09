@@ -22,6 +22,8 @@ public struct Vector2Int
 {
     public static readonly Vector2Int negativeInfinity = new(int.MinValue);
     public static readonly Vector2Int positiveInfinity = new(int.MaxValue);
+    public static readonly Vector2Int zero = new(0, 0);
+
 
     public int x { get; set; }
     public int y { get; set; }
