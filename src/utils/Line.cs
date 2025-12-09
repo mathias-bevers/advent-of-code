@@ -1,33 +1,52 @@
 namespace advent_of_code.utils;
 
-internal struct Line(Vector2Int start, Vector2Int end)
+internal struct Line
 {
-    public Vector2Int start { get; } = start;
-    public Vector2Int end { get; } = end;
+    public Vector2Int start { get; }
+    public Vector2Int end { get; }
     public bool IsHorizontal => (this.start.x == this.end.x);
     public bool IsVertical => (this.start.y == this.end.y);
 
-
-    // code found on: https://csharphelper.com/howtos/howto_segment_intersection.html
-    public Vector2? Intersects(Line other)
+    public Line(Vector2Int start, Vector2Int end)
     {
-        if (Equals(other)) { throw new ArgumentException("lines are the same"); }
+        this.start = start;
+        this.end = end;
+    }
 
-        double dx12 = end.x - start.x;
-        double dy12 = end.y - start.y;
-        double dx34 = other.end.x - other.start.x;
-        double dy34 = other.end.y - other.start.y;
+    public Line(int xs, int ys, int xe, int ye)
+    {
+        start = new Vector2Int(xs, ys);
+        end = new Vector2Int(xe, ye);
+    }
 
-        double denominator = dy12 * dx34 - dx12 * dy34;
-        double t1 = ((start.x - other.start.x) * dy34 + (other.start.y - start.y) * dx34)
-                    / denominator;
 
-        if (double.IsInfinity(t1))
+    // code found on: https://github.com/setchi/Unity-LineSegmentsIntersection/blob/master/Assets/LineSegmentIntersection/Scripts/Math2d.cs
+    public bool Intersects(Line other, out Vector2 intersection)
+    {
+        intersection = Vector2.zero;
+        int d = (end.x - start.x) * (other.end.y - other.start.y) -
+                (end.y - start.y) * (other.end.x - other.start.x);
+
+        if (Math.Abs(d) < 0.001f)
         {
-            return null;
+            return false;
         }
 
-        return new Vector2((float)(start.x + dx12 * t1), (float)(start.y + dy12 * t1));
+        var u = (float)((other.start.x - start.x) * (other.end.y - other.start.y) -
+                        (other.start.y - start.y) * (other.end.x - other.start.x)) / d;
+
+        var v = (float)((other.start.x - start.x) * (end.y - start.y) -
+                        (other.start.y - start.y) * (end.x - start.x)) / d;
+
+        if (u < 0.0f || u > 1.0f || v < 0.0f || v > 1.0f)
+        {
+            return false;
+        }
+
+        intersection.x = start.x + u * (end.x - start.x);
+        intersection.y = start.y + u * (end.y - start.y);
+
+        return true;
     }
 
     // code found on: https://stackoverflow.com/a/11908158/12806909
