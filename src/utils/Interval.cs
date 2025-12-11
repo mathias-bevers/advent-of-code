@@ -6,7 +6,7 @@ internal record Interval<T>(T start, T end) : Interval where T : INumber<T>
 {
     public T start { get; } = start;
     public T end { get; } = end;
-    public T difference { get; } = end - start;
+    public T difference { get; } = (end - start) + T.One;
 
     public bool Contains(T value)
     {
@@ -50,7 +50,7 @@ internal record Interval
     where T : INumber<T>
     {
         List<Interval<T>> collapsed = [.. collection.OrderBy(i => i.end)];
-        
+
         for (int i = collapsed.Count - 1; i > 0; i--)
         {
             Interval<T> a = collapsed[i];
@@ -67,8 +67,7 @@ internal record Interval
                 collapsed.Insert(i - 1, Union(a, b));
             }
         }
-
-
+        
         return collapsed;
     }
 
