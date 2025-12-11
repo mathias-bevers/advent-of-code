@@ -6,6 +6,7 @@ internal struct Rectangle
 {
     public Vector2Int position { get; }
     public Vector2Int size { get; }
+    public Vector2Int bottomRight { get; }
     public ulong area { get; }
 
     public Rectangle(Vector2Int position, Vector2Int size)
@@ -15,11 +16,14 @@ internal struct Rectangle
         if (size.x < 0 || size.y < 0)
         {
             Logger.Error(size + " is invalid, setting to [0,0]");
-            size = Vector2Int.zero;
+            this.size = Vector2Int.zero;
+            bottomRight = Vector2Int.zero;
+            area = 0;
+            return;
         }
 
         this.size = size;
-
+        bottomRight = this.position + (this.size - Vector2Int.one);
         area = (ulong)this.size.x * (ulong)this.size.y;
     }
 
@@ -30,20 +34,24 @@ internal struct Rectangle
         if (width < 0 || size.y < 0)
         {
             Logger.Error($"[{width}, {height}] is invalid, setting to [0,0]");
-            width = height = 0;
+            size = Vector2Int.zero;
+            bottomRight = Vector2Int.zero;
+            area = 0;
+            return;
         }
 
 
         size = new Vector2Int(width, height);
-        area = (ulong)this.size.x * (ulong)this.size.y;
+        bottomRight = position + (size - Vector2Int.one);
+        area = (ulong)size.x * (ulong)size.y;
     }
 
     public static Rectangle CreateFromPoints(Vector2Int a, Vector2Int b)
     {
         int left = Math.Min(a.x, b.x);
-        int width = (Math.Max(a.x, b.x) - left) + 1;
+        int width = Math.Max(a.x, b.x) - left + 1;
         int top = Math.Min(a.y, b.y);
-        int height = (Math.Max(a.y, b.y) - top) + 1;
+        int height = Math.Max(a.y, b.y) - top + 1;
 
         if (width < 1 || height < 1)
         {
@@ -52,17 +60,6 @@ internal struct Rectangle
         }
 
         return new Rectangle(left, top, width, height);
-    }
-
-    public Vector2Int[] GetCorners()
-    {
-        Vector2Int[] corners = new Vector2Int[4];
-        corners[0] = position;
-        corners[2] = position + size - Vector2Int.one;
-        corners[1] = new(corners[2].x, position.y);
-        corners[3] = new(position.x, corners[2].y);
-
-        return corners;
     }
 
     public override readonly int GetHashCode()
@@ -94,7 +91,7 @@ internal struct Rectangle
         sb.Append(size);
         sb.Append(" area: ");
         sb.Append(area);
-        sb.Append("]");
+        sb.Append(']');
 
         return sb.ToString();
     }

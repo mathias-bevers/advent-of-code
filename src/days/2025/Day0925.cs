@@ -28,11 +28,11 @@ internal class Day0925 : IDay
             if (i == 0) { continue; }
 
             // add a new line from previous to current position.
-            lines[i - 1] = new Line(positions[i - 1], positions[i]);
+            lines[i - 1] = ContructLine(positions[i - 1], positions[i]);
         }
 
         // lastly add the line from the last position to the first to complete the circle.
-        lines[^1] = new Line(positions[^1], positions[0]);
+        lines[^1] = ContructLine(positions[^1], positions[0]);
 
         // compute all posible rectangles.
         HashSet<Rectangle> tmp = new();
@@ -40,7 +40,8 @@ internal class Day0925 : IDay
         {
             for (int ii = i + 1; ii < positions.Length; ii++)
             {
-                tmp.Add(Rectangle.CreateFromPoints(positions[i], positions[ii]));
+                Rectangle rectangle = Rectangle.CreateFromPoints(positions[i], positions[ii]);
+                tmp.Add(rectangle);
             }
         }
 
@@ -71,122 +72,75 @@ internal class Day0925 : IDay
 
     public string SolveStarTwo()
     {
-        ulong? largest = null;
-        List<Rectangle> validRectangles = new(rectangles.Length);
-        bool isValid;
+        ulong? largestArea = null;
+        Rectangle? largest = null;
 
         for (int i = 0; i < rectangles.Length; i++)
         {
-            isValid = true;
-            Rectangle rectangle = rectangles[i];
-            Vector2Int[] corners = rectangle.GetCorners();
-
-            for (int ii = 0; ii < 4; ii++) //corners is always 4.
-            {
-                if (InDataSet(corners[ii]))
-                {
-                    continue;
-                }
-
-                bool inside = IsInSide(corners[ii]);
-                if (inside) { continue; }
-
-                isValid = false;
-                break;
-            }
-
-            if (!isValid)
+            Rectangle rect = rectangles[i];
+            if (rect.area <= largestArea)
             {
                 continue;
             }
 
-            validRectangles.Add(rectangle);
-        }
-
-        Grid<char> validator = new Grid<char>(10, 10);
-        validator.Fill('.');
-
-        for (int i = 0; i < validRectangles.Count; i++)
-        {
-            Rectangle rectangle = validRectangles[i];
-            Logger.Info(rectangle);
-            ulong area = rectangle.area;
-
-            for (int y = 0; y < rectangle.size.y; ++y)
-            {
-                for (int x = 0; x < rectangle.size.x; ++x)
-                {
-                    int rX = rectangle.position.x + x;
-                    validator[rX, rectangle.position.y + y] = 'x';
-                }
-            }
-
-            if (largest > area)
+            if (!IsValid(ref rect))
             {
                 continue;
             }
 
-            largest = area;
+            largest = rect;
+            largestArea = rect.area;
         }
 
-
-        if (!largest.HasValue)
+        if (largestArea.HasValue && largest.HasValue)
         {
-            Logger.Error("largest is null, so none has been found");
-            return "ERROR";
+            Logger.Info(string.Concat(largest.Value.position, "->", largest.Value.bottomRight));
+            return largestArea.Value.ToString();
         }
 
-        if (positions.Length < 25)
-        {
-            Debug.Assert(largest == 24);
-        }
-        else
-        {
-            Debug.Assert(largest < 4636745093, $"largest ({largest}) >= 4636745093");
-        }
 
-        return largest.Value.ToString();
+        Logger.Error("largest is null, so none has been found");
+        return "ERROR";
     }
 
-    private bool IsInSide(Vector2Int point)
+    private bool IsValid(ref Rectangle rect)
     {
-        Line test = new Line(point, new Vector2Int(100_000, point.y));
-        int intersectionCount = 0;
-
-        for (int i = 0; i < lines.Length; ++i)
+        for (int i = 0; i < lines.Length; i++)
         {
             Line line = lines[i];
 
-            if (line.IsHorizontal)
+            if (line.start.x >= rect.bottomRight.x)
             {
                 continue;
             }
 
-            if (!line.Intersects(test, out Vector2 intersection))
+            if (line.end.x <= rect.position.x)
             {
                 continue;
             }
 
-            ++intersectionCount;
+            if (line.start.y >= rect.bottomRight.y)
+            {
+                continue;
+            }
+
+            if (line.end.y <= rect.position.y)
+            {
+                continue;
+            }
+
+            return false;
         }
 
-        bool inSide = intersectionCount % 2 == 1;
-        Logger.Info(string.Concat(point, ": ", intersectionCount, " so ", inSide));
-        return inSide;
+        return true;
     }
 
-    private bool InDataSet(Vector2Int point)
+    private static Line ContructLine(Vector2Int a, Vector2Int b)
     {
-        for (int i = 0; i < positions.Length; i++)
-        {
-            if (point != positions[i])
-            {
-                continue;
-            }
-
-            return true;
-        }
-
-        return false;
+        int xs = Math.Min(a.x, b.x);
+        int ys = Math.Min(a.y, b.y);
+        int xe = Math.Max(a.x, b.x);
+        int ye = Math.Max(a.y, b.y);
+        return new Line(xs, ys, xe, ye);
     }
 }
