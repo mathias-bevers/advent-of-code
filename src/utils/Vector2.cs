@@ -4,6 +4,8 @@ namespace advent_of_code.utils;
 
 public struct Vector2
 {
+    public static readonly Vector2 zero = new(0, 0);
+
     public float x { get; set; }
     public float y { get; set; }
 
@@ -16,12 +18,17 @@ public struct Vector2
     public Vector2(float value) => x = y = value;
 
     public Vector2() => x = y = 0;
+
+    public override readonly string ToString() => string.Concat('[', x, ", ", y, ']');
 }
 
 public struct Vector2Int
 {
     public static readonly Vector2Int negativeInfinity = new(int.MinValue);
     public static readonly Vector2Int positiveInfinity = new(int.MaxValue);
+    public static readonly Vector2Int zero = new(0, 0);
+    public static readonly Vector2Int one = new(1, 1);
+
 
     public int x { get; set; }
     public int y { get; set; }

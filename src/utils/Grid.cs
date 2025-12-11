@@ -72,6 +72,17 @@ internal class Grid<T>
         }
     }
 
+    public void Fill(T value)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                grid[x, y] = value;
+            }
+        }
+    }
+
     public IEnumerable<T> As1D()
     {
         return grid.Cast<T>();
