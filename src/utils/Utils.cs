@@ -32,3 +32,8 @@ internal static class Utils
         }
     }
 }
+
+namespace advent_of_code.utils
+{
+    public class FailSaveException(string message) : Exception(message) { }
+}
