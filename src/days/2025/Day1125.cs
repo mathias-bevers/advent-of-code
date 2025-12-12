@@ -1,5 +1,5 @@
 using advent_of_code.utils;
-using CommandLine;
+using PreCalcData = (string key, bool fft, bool dac);
 
 namespace advent_of_code.days;
 
@@ -66,11 +66,11 @@ internal class Day1125 : IDay
 
     public string SolveStarOne()
     {
-        Dictionary<string, long> preCalc = new();
+        Dictionary<string, long> preCalc = [];
 
         try
         {
-            long numberOfPaths = FindYouPaths(YOU, ref preCalc, 0);
+            long numberOfPaths = FindPathsStarOne(YOU, ref preCalc, 0);
             return numberOfPaths.ToString();
         }
         catch (FailSaveException e)
@@ -82,11 +82,11 @@ internal class Day1125 : IDay
 
     public string SolveStarTwo()
     {
-        Dictionary<string, long> preCalc = new();
+        Dictionary<PreCalcData, long> preCalc = [];
 
         try
         {
-            long numberOfPaths = FindSvrPaths(SVR, ref preCalc, new List<string>(), 0);
+            long numberOfPaths = FindPathsStarTwo(SVR, ref preCalc, [], 0);
             return numberOfPaths.ToString();
         }
         catch (FailSaveException e)
@@ -96,9 +96,9 @@ internal class Day1125 : IDay
         }
     }
 
-    private long FindYouPaths(string key, ref Dictionary<string, long> preCalc, int n)
+    private long FindPathsStarOne(string key, ref Dictionary<string, long> preCalc, int n)
     {
-        if (n == 50) // tested max depth in my case this is 22 so allow for wiggle room.
+        if (n == 30) // tested max depth in my case this is 22 so allow for wiggle room.
         {
             throw new FailSaveException($"triggered fail save on: " + key);
         }
@@ -117,64 +117,74 @@ internal class Day1125 : IDay
         string[] routes = devices[key];
         for (int i = 0; i < routes.Length; ++i)
         {
-            value += FindYouPaths(routes[i], ref preCalc, ++n);
+            value += FindPathsStarOne(routes[i], ref preCalc, ++n);
         }
 
+        preCalc[key] = value;
         return value;
     }
 
-    private long FindSvrPaths(string key, ref Dictionary<string, long> preCalc,
+    private long FindPathsStarTwo(string key, ref Dictionary<PreCalcData, long> preCalc,
                               List<string> path, int n)
     {
-        if (n == 10_000)
+        if (n == 60) // tested max depth in my case this is 50 so allow for wiggle room.
         {
             throw new FailSaveException($"triggered fail save on: " + key);
         }
 
+        PreCalcData data = GenerateDataForKey(key, ref path);
+
         if (string.Equals(key, OUT))
         {
-            return IsValidPath(ref path) ? 1 : 0;
+            if (data.fft && data.dac)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
-        if (preCalc.TryGetValue(key, out long value))
+        if (preCalc.TryGetValue(data, out long value))
         {
             return value;
         }
 
         value = 0;
         string[] routes = isExample ? example[key] : devices[key];
-        List<string> newPath = new(path);
-        newPath.Add(key);
+        List<string> newPath = [.. path, key];
         for (int i = 0; i < routes.Length; ++i)
         {
-            value += FindSvrPaths(routes[i], ref preCalc, newPath, ++n);
+            value += FindPathsStarTwo(routes[i], ref preCalc, newPath, ++n);
         }
 
+        preCalc[data] = value;
         return value;
     }
 
-    private bool IsValidPath(ref List<string> path)
+    private static PreCalcData GenerateDataForKey(string key, ref List<string> path)
     {
-        bool foundFFT = false;
-        bool foundDAC = false;
+        bool fft = false;
+        bool dac = false;
 
         for (int i = 0; i < path.Count; ++i)
         {
             if (path[i].Equals(FFT))
             {
-                foundFFT = true;
+                fft = true;
             }
             else if (path[i].Equals(DAC))
             {
-                foundDAC = true;
+                dac = true;
             }
 
-            if (foundFFT && foundDAC)
+            if (fft && dac)
             {
-                return true;
+                break;
             }
         }
 
-        return false;
+        return (key, fft, dac);
     }
 }
